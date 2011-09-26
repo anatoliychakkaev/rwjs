@@ -20,6 +20,10 @@ namespace :deploy do
     run "sudo start #{application}-#{node_env}"
   end
 
+  task :content, :roles => :app, :except => { :no_release => true } do
+    run "cd #{current_path}/wiki && git pull origin master && cd ../ && node generate"
+  end
+
   task :stop, :roles => :app, :except => { :no_release => true } do
     run "sudo stop #{application}-#{node_env}"
   end

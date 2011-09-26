@@ -28,10 +28,10 @@ module.exports = function () {
         code = md.makeHtml(code);
         code = bootstrapize(code);
 
-        html += '<section id="' + sectionId + '">';
+        html += '\n<section id="' + sectionId + '">';
         html += code;
-        html += '<h6><a href="/' + sectionId + '.html#disqus_thread">Discuss on #' + sectionId + '</a></h6>';
-        html += '</section>';
+        // html += '<h6><a href="/' + sectionId + '.html#disqus_thread">Discuss on #' + sectionId + '</a></h6>';
+        html += '</section>\n';
 
         header += '<li><a href="#' + sectionId + '">' + section + '</a></li>';
 
