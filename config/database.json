@@ -1,0 +1,21 @@
+{ "development":
+  { "driver":   "mongoose"
+  , "host":     "localhost"
+  , "database": "cms-dev"
+  }
+, "test":
+  { "driver":   "mongoose"
+  , "host":     "localhost"
+  , "database": "cms-test"
+  }
+, "staging":
+  { "driver":   "mongoose"
+  , "host":     "localhost"
+  , "database": "cms-staging"
+  }
+, "production":
+  { "driver":   "mongoose"
+  , "host":     "localhost"
+  , "database": "cms-production"
+  }
+}
