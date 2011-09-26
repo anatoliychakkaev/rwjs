@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>RailwayJS</title>
+
+    <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.3.0/bootstrap.min.css">
+    <link href="/javascripts/prettyprint/prettify.css" rel="stylesheet">
+
+    <script type="text/javascript" src="/javascripts/prettyprint/prettify.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script type="text/javascript" src="http://twitter.github.com/bootstrap/1.3.0/bootstrap-scrollspy.js"></script>
+    <script>$(function () { prettyPrint() })</script>
+
+    <style>
+      section {
+        padding-top: 60px;
+      }
+    </style>
+
+  </head>
+  <body style="padding-top: 60px">
+    <a href="http://github.com/1602/express-on-railway"><img style="position: fixed; top: 0; right: 0; border: 0;z-index: 10001;" src="https://d3nwyuy0nl342s.cloudfront.net/img/e6bef7a091f5f3138b8cd40bc3e114258dd68ddf/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub"></a>
+    <div class="topbar-wrapper" style="z-index: 5;">
+      <div class="topbar" data-scrollspy="scrollspy">
+        <div class="topbar-inner">
+          <div class="container">
+            <h3><a href="#">RailwayJS</a></h3>
+            <ul class="nav">
+              <li><a href="/about.html">About</a></li><li><a href="/routing.html">Routing</a></li><li><a href="/controller.html">Controller</a></li><li><a href="/views.html">Views</a></li><li><a href="/generators.html">Generators</a></li><li><a href="/console.html">Console</a></li><li><a href="/coffee.html">Coffee</a></li><li class="active"><a href="/localization.html">Localization</a></li><li><a href="/extensions.html">Extensions</a></li><li><a href="/heroku.html">Heroku</a></li>
+              <!--li class="dropdown">
+                <a href="#" class="dropdown-toggle">Features</a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">Extensions</a></li>
+                  <li><a href="#">Coffee</a></li>
+                  <li class="divider"></li>
+                  <li><a href="#">Contributing</a></li>
+                </ul>
+              </li-->
+            </ul>
+          </div>
+        </div><!-- /topbar-inner -->
+      </div><!-- /topbar -->
+    </div><!-- /topbar-wrapper -->
+
+<div class="container">
+  <h1 style="text-align: center; font-size: 250%; position: relative; top: 30px;"><span style="color: #a24;">RightwayJS - MVC framework</span><br/><small>Create NodeJS web apps faster with more energy, using RailwayJS</small></h1>
+
+  <section><div class="page-header">
+
+<h1>Localization <small>How to build multi-language apps</small></h1>
+
+</div>
+
+<div class="row">
+
+<div class="span4">
+
+<p>Basic steps:</p>
+
+<ol>
+<li>create dictionary to translate tokens to natural language (<code>config/locales/*.yml</code>)</li>
+<li>Use tokens instead of natural language everywhere in app (<code>t</code> helper)</li>
+<li>Manually detect language of each user request (<code>setLocale</code> method)</li>
+</ol>
+
+</div>
+
+<div class="span8">
+
+<p>Railway allows you to create application translated to different languages: just place localization file in <code>yaml</code> format to <code>config/locales</code> dir:</p>
+
+<p><code>config/locales/en.yml</code></p>
+
+<pre class="prettyprint">en:
+  session:
+    new: "Sign in"
+    destroy: "Sign out"
+  user:
+    new: "Sign up"
+    destroy: "Cancel my account"
+    welcome: "Hello %, howdy?
+    validation:
+      name: "Username required"
+</pre>
+
+<p>NOTE: translations can contain <code>%</code> symbol(s), that means variable substitution</p>
+
+<p>Define user locale in application controller:</p>
+
+<p><code>app/controllers/application_controller.js</code></p>
+
+<pre class="prettyprint">before(setUserLocale);
+function setUserLocale () {
+    // define locale from user settings, or from headers or use default
+    var locale = req.user ? req.user.locale : 'en';
+    // call global function setLocale
+    setLocale(locale);
+}
+</pre>
+
+<p>and use localized tokens inside app views with <code>t</code> helper:</p>
+
+<pre class="prettyprint">&lt;%= t('session.new') %&gt;
+&lt;%= t('user.new') %&gt;
+&lt;%= t(['user.welcome', user.name]) %&gt;
+</pre>
+
+<p>or inside controllers:</p>
+
+<pre class="prettyprint">flash('error', t('user.validation.name'));
+</pre>
+
+<p>or inside models:</p>
+
+<pre class="prettyprint">return t('email.activate', 'en');
+</pre>
+
+<p>NOTE: when use t helpers inside models you must pass <code>locale</code> as second param to <code>t</code> helper.</p>
+
+<h2>Configuration</h2>
+
+<p>Localization behavior can be configured using following settings:</p>
+
+<ul>
+<li>defaultLocale: name of default locale</li>
+<li>translationMissing: what action perfor when translation is missing, possible values: <code>default</code> - display translation for default locale, <code>display</code> - show error like "Translation missing for email.activate"</li>
+</ul>
+
+<p>Example:</p>
+
+<pre class="prettyprint">app.configure(function () {
+    app.set('defaultLocale', 'en');
+});
+
+app.configure('development', function(){
+    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+    app.set('translationMissing', 'display');
+});
+
+app.configure('production', function () {
+    app.use(express.errorHandler()); 
+    app.set('translationMissing', 'default');
+});
+</pre>
+
+</div>
+
+</div></section><div class="row"><div class="span8 offset4" id="disqus_thread"></div></div><script>$(function () {var disqus_shortname = 'railwayjs', disqus_identifier = "<%= page.path %>"; $.getScript("http://railwayjs.disqus.com/embed.js");})</script>
+</div>
+
+<footer class="footer">
+<div class="container">
+  <p class="pull-right"><a href="#">Back to top</a></p>
+  <p>
+    Documentation written by <a href="http://twitter.com/1602">@1602 (Anatoliy Chakkaev)</a>.<br/>
+    Designed and built with all the love in the world <a href="http://twitter.com/twitter" target="_blank">@twitter</a> by <a href="http://twitter.com/mdo" target="_blank">@mdo</a> and <a href="http://twitter.com/fat" target="_blank">@fat</a>.<br>
+    RailwayJS code licensed under the <a href="http://www.opensource.org/licenses/mit-license.php" target="_blank">MIT License</a>. Documentation licensed under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.
+  </p>
+</div>
+</footer>
+
+</html>

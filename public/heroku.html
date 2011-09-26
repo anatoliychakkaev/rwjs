@@ -26,7 +26,7 @@
           <div class="container">
             <h3><a href="#">RailwayJS</a></h3>
             <ul class="nav">
-              HEADER
+              <li><a href="/about.html">About</a></li><li><a href="/routing.html">Routing</a></li><li><a href="/controller.html">Controller</a></li><li><a href="/views.html">Views</a></li><li><a href="/generators.html">Generators</a></li><li><a href="/console.html">Console</a></li><li><a href="/coffee.html">Coffee</a></li><li><a href="/localization.html">Localization</a></li><li><a href="/extensions.html">Extensions</a></li><li class="active"><a href="/heroku.html">Heroku</a></li>
               <!--li class="dropdown">
                 <a href="#" class="dropdown-toggle">Features</a>
                 <ul class="dropdown-menu">
@@ -45,7 +45,95 @@
 <div class="container">
   <h1 style="text-align: center; font-size: 250%; position: relative; top: 30px;"><span style="color: #a24;">RightwayJS - MVC framework</span><br/><small>Create NodeJS web apps faster with more energy, using RailwayJS</small></h1>
 
-  SECTIONS
+  <section><div class="page-header">
+
+<h1>Heroku <small>Guide for deploying RailwayJS app on <a href="http://heroku.com/">Heroku.com</a> cloud hosting</small></h1>
+
+</div>
+
+<div class="row">
+
+<div class="span4">
+
+<p>Heroku nodejs hosting is available for public using now. You can deploy your RailwayJS application as simple as <code>git push</code>.</p>
+
+<p>To work with heroku you also need: ruby, <code>heroku</code> gem</p>
+
+</div>
+
+<div class="span8">
+
+<p>First of all, create app</p>
+
+<pre class="prettyprint">railway init heroku-app
+cd heroku-app
+sudo npm link
+railway g crud post title content
+</pre>
+
+<p>Then init git repo</p>
+
+<pre class="prettyprint">git init
+git add .
+git commit -m 'Init'
+</pre>
+
+<p>Create heroku app</p>
+
+<pre class="prettyprint">heroku create --stack cedar
+</pre>
+
+<p>We need mongodb</p>
+
+<pre class="prettyprint">heroku addons:add mongohq:free
+</pre>
+
+<p>And deploy</p>
+
+<pre class="prettyprint">git push heroku master
+</pre>
+
+<p>Hook up Procfile (only once)</p>
+
+<pre class="prettyprint">heroku ps:scale web=1
+</pre>
+
+<p>Check application state</p>
+
+<pre class="prettyprint">heroku ps
+</pre>
+
+<p>Visit app</p>
+
+<pre class="prettyprint">heroku open
+</pre>
+
+<p>If something went wrong, you can check out logs</p>
+
+<pre class="prettyprint">heroku logs
+</pre>
+
+<p>But for me it useless. Better to run commands in node console:</p>
+
+<pre class="prettyprint">heroku run node
+&gt; var app = require('railway').createServer();
+</pre>
+
+<p>It helps to identify exact problems with app installation.
+Also you can access railway console using command</p>
+
+<pre class="prettyprint">heroku run railway console
+</pre>
+
+<p>BTW, mongohq provides web interface for browsing your mongo database, to use it go to http://mongohq.com/ and create account,
+then click "Add remote connection" and configure link to database. You can retrieve details required for connection using command</p>
+
+<pre class="prettyprint">heroku config --long
+</pre>
+
+</div>
+
+</div></section><div class="row"><div class="span8 offset4" id="disqus_thread"></div></div><script>$(function () {var disqus_shortname = 'railwayjs', disqus_identifier = "<%= page.path %>"; $.getScript("http://railwayjs.disqus.com/embed.js");})</script>
 </div>
 
 <footer class="footer">

@@ -26,7 +26,7 @@
           <div class="container">
             <h3><a href="#">RailwayJS</a></h3>
             <ul class="nav">
-              HEADER
+              <li class="active"><a href="/about.html">About</a></li><li><a href="/routing.html">Routing</a></li><li><a href="/controller.html">Controller</a></li><li><a href="/views.html">Views</a></li><li><a href="/generators.html">Generators</a></li><li><a href="/console.html">Console</a></li><li><a href="/coffee.html">Coffee</a></li><li><a href="/localization.html">Localization</a></li><li><a href="/extensions.html">Extensions</a></li><li><a href="/heroku.html">Heroku</a></li>
               <!--li class="dropdown">
                 <a href="#" class="dropdown-toggle">Features</a>
                 <ul class="dropdown-menu">
@@ -45,7 +45,72 @@
 <div class="container">
   <h1 style="text-align: center; font-size: 250%; position: relative; top: 30px;"><span style="color: #a24;">RightwayJS - MVC framework</span><br/><small>Create NodeJS web apps faster with more energy, using RailwayJS</small></h1>
 
-  SECTIONS
+  <section><div class="page-header">
+
+<h1>About Railway <small>Objective, getting started, technical details</small></h1>
+
+</div>
+
+<div class="row">
+
+<div class="span-one-third">
+
+<h3>What is railway?</h3>
+
+<p>Railway is the Node.JS MVC framework based on <a href="http://expressjs.com/guide">ExpressJS</a>, fully <strong>ExpressJS-compatible</strong>. It allows you to build web applications in a similar manner as in Ruby On Rails.</p>
+
+<p>The main objective of the framework - web development without pain.</p>
+
+<h3>Related links</h3>
+
+<ul>
+<li><a href="https://github.com/1602/express-on-railway/issues">Have spotted bug? Report!</a></li>
+<li><a href="http://groups.google.com/group/railwayjs">RailwayJS Google Group</a></li>
+<li><a href="http://node-js.ru/">RailwayJS author's blog</a></li>
+</ul>
+
+</div>
+
+<div class="span-one-third">
+
+<h3>1. Install</h3>
+
+<pre class="prettyprint">sudo npm install railway -g
+</pre>
+
+<h3>2. Use</h3>
+
+<p>You can use app generator and the scaffold generator to build your first railway app in seconds</p>
+
+<pre class="prettyprint">rw i blog &amp;&amp; cd blog
+npm install -l
+rw g crud post title content
+# ensure mongodb is running
+rw s 8888
+open http://127.0.0.1:8888/posts
+</pre>
+
+</div>
+
+<div class="span-one-third">
+
+<h3>What is under the hood</h3>
+
+<ul>
+<li>Full MVC+H stack</li>
+<li>Resource-based <a href="http://railwayjs.com/#routing">routing</a></li>
+<li><a href="http://mongoosejs.com/">Mongoose.js</a> ORM</li>
+<li>Multi-locale support</li>
+<li><a href="http://jashkenas.github.com/coffee-script/">Coffee-script</a> support (<a href="http://railwayjs.com/#coffee">howto</a>)</li>
+<li>Generators for model, controller, scaffold</li>
+<li>Testing: nodeunit, cucumis, code coverage reporting</li>
+<li>Debugging: <a href="http://railwayjs.com/#console">railway console</a></li>
+<li><a href="http://railwayjs.com/#extensions">Extensions</a></li>
+</ul>
+
+</div>
+
+</div></section><div class="row"><div class="span8 offset4" id="disqus_thread"></div></div><script>$(function () {var disqus_shortname = 'railwayjs', disqus_identifier = "<%= page.path %>"; $.getScript("http://railwayjs.disqus.com/embed.js");})</script>
 </div>
 
 <footer class="footer">

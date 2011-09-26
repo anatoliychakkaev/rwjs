@@ -40,7 +40,7 @@ module.exports = function () {
             headerSA += '<li' + (sec == section ? ' class="active"' : '') + '><a href="/' + sec.toLowerCase() + '.html">' + sec + '</a></li>';
         });
 
-        write(sectionId, headerSA, '<section>' + code + '</section><div class="row"><div class="span8 offset4" id="disqus_thread"></div></div><script>$(function () {var disqus_shortname = \'railwayjs\', disqus_identifier = "<%= page.path %>"; $.getScript("http://railwayjs.disqus.com/embed.js");})</script>');
+        console.log(write(sectionId, headerSA, '<section>' + code + '</section><div class="row"><div class="span8 offset4" id="disqus_thread"></div></div><script>$(function () {var disqus_shortname = \'railwayjs\', disqus_identifier = "<%= page.path %>"; $.getScript("http://railwayjs.disqus.com/embed.js");})</script>'));
       
     });
 
@@ -54,7 +54,7 @@ function write(name, header, html) {
             .replace('HEADER', header);
 
     fs.writeFileSync('./public/' + name + '.html', file);
-    return file.length + ' bytes';
+    return name + '.html ' + file.length + ' bytes';
 }
 
 function bootstrapize(code) {

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>RailwayJS</title>
+
+    <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.3.0/bootstrap.min.css">
+    <link href="/javascripts/prettyprint/prettify.css" rel="stylesheet">
+
+    <script type="text/javascript" src="/javascripts/prettyprint/prettify.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script type="text/javascript" src="http://twitter.github.com/bootstrap/1.3.0/bootstrap-scrollspy.js"></script>
+    <script>$(function () { prettyPrint() })</script>
+
+    <style>
+      section {
+        padding-top: 60px;
+      }
+    </style>
+
+  </head>
+  <body style="padding-top: 60px">
+    <a href="http://github.com/1602/express-on-railway"><img style="position: fixed; top: 0; right: 0; border: 0;z-index: 10001;" src="https://d3nwyuy0nl342s.cloudfront.net/img/e6bef7a091f5f3138b8cd40bc3e114258dd68ddf/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub"></a>
+    <div class="topbar-wrapper" style="z-index: 5;">
+      <div class="topbar" data-scrollspy="scrollspy">
+        <div class="topbar-inner">
+          <div class="container">
+            <h3><a href="#">RailwayJS</a></h3>
+            <ul class="nav">
+              <li><a href="/about.html">About</a></li><li><a href="/routing.html">Routing</a></li><li><a href="/controller.html">Controller</a></li><li class="active"><a href="/views.html">Views</a></li><li><a href="/generators.html">Generators</a></li><li><a href="/console.html">Console</a></li><li><a href="/coffee.html">Coffee</a></li><li><a href="/localization.html">Localization</a></li><li><a href="/extensions.html">Extensions</a></li><li><a href="/heroku.html">Heroku</a></li>
+              <!--li class="dropdown">
+                <a href="#" class="dropdown-toggle">Features</a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">Extensions</a></li>
+                  <li><a href="#">Coffee</a></li>
+                  <li class="divider"></li>
+                  <li><a href="#">Contributing</a></li>
+                </ul>
+              </li-->
+            </ul>
+          </div>
+        </div><!-- /topbar-inner -->
+      </div><!-- /topbar -->
+    </div><!-- /topbar-wrapper -->
+
+<div class="container">
+  <h1 style="text-align: center; font-size: 250%; position: relative; top: 30px;"><span style="color: #a24;">RightwayJS - MVC framework</span><br/><small>Create NodeJS web apps faster with more energy, using RailwayJS</small></h1>
+
+  <section><div class="page-header">
+
+<h1>Views <small>layouts, partials, views, helpers, forms, csrf-stuff, etc..</small></h1>
+
+</div>
+
+<div class="row">
+
+<div class="span-one-third">
+
+<h3>Templating engines</h3>
+
+<p>By default railway use <code>ejs</code> templating engine, but you can switch to jade, using settings</p>
+
+<pre class="prettyprint">app.set('view engine', 'jade');
+</pre>
+
+<p>and add line</p>
+
+<pre class="prettyprint">require('jade-ext');
+</pre>
+
+<p>to <code>./npmfile.js</code></p>
+
+</div>
+
+<div class="span-two-thirds">
+
+<h3>View rendering flow</h3>
+
+<p>Every controller action may call <code>render</code> method to display associated view. For example, action <code>index</code> in controller <code>users</code> will render view in file <code>app/views/users/index.ejs</code>.</p>
+
+<p>This view will be rendered within the layout specified by <code>layout</code> call in the controller. By default layout name is the same as controller name, <code>app/views/layouts/users_layout.ejs</code> in this case. If this layout file is not exists, <code>application</code> layout used.</p>
+
+<p>If you need render view without layout you can call <code>layout(false)</code> inside controller, this will skip layout rendering.</p>
+
+</div>
+
+</div>
+
+<h3>Built-in Helpers</h3>
+
+<div class="row">
+
+<div class="span4">
+
+<ul>
+<li><code>link_to</code></li>
+</ul>
+
+</div>
+
+<div class="span12">
+
+<pre class="prettyprint">link_to('Users index', '/users');
+// &lt;a href="/users"&gt;Users index&lt;/a&gt;
+link_to('Users index', '/users', {class: 'menu-item'});
+// &lt;a href="/users" class="menu-item"&gt;Users index&lt;/a&gt;
+link_to('Users index', '/users', {remote: true});
+// &lt;a href="/users" data-remote="true"&gt;Users index&lt;/a&gt;
+</pre>
+
+<ul>
+<li>First argument is link text.</li>
+<li>Second argument is link path.</li>
+<li>Third argument is object with link properties.</li>
+</ul>
+
+<p>In the last example third argument is <code>{remote: true}</code>, and as you can see it will add <code>data-remote="true"</code> attribute to <code>a</code> tag. Clicking on this link will send async GET request to <code>/users</code>. Result will be executed as javascript.</p>
+
+<p>Here you can also specify <code>jsonp</code> param to handle response:</p>
+
+<pre class="prettyprint">link_to('Users index', '/users', {remote: true, jsonp: 'renderUsers'});
+// &lt;a href="/users" data-remote="true" data-jsonp="renderUsers"&gt;Users index&lt;/a&gt;
+</pre>
+
+<p>Server will send you json <code>{users: [{},{},{}]}</code>, and this object will be passed as an argument to the <code>renderUsers</code> function:</p>
+
+<pre class="prettyprint">renderUsers({users: [{},{},{}]});
+</pre>
+
+<p>You can also specify anonimous function in jsonp param:</p>
+
+<pre class="prettyprint">{jsonp: '(function (url) {location.href = url;})'}
+</pre>
+
+<p>When server will send you <code>"http://google.com/"</code> following javascript will be evaluated:</p>
+
+<pre class="prettyprint">(function (url) {location.href = url;})("http://google.com");
+</pre>
+
+<p>This is why you should wrap anonimous function with parentheses.</p>
+
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="span4">
+
+<ul>
+<li><code>form_for</code></li>
+</ul>
+
+</div>
+
+<div class="span12">
+
+<p>Accepts three params: resource, params and block. Block is function that receives as single param special object, which provide helpers with pre-filled values. Available helpers:</p>
+
+<ul>
+<li>input</li>
+<li>label</li>
+<li>textarea</li>
+<li>submit</li>
+<li><p>checkbox</p>
+
+<% form_for(user, {action: path_to.users}, function (form) { %>
+
+   <p>
+       <%- form.label('name', 'Username') %>
+       <%- form.input('name') %>
+   </p>
+   <p>
+       <%- form.submit('Save') %>
+   </p>
+<% }); %></li>
+</ul>
+
+<p>will generate</p>
+
+<pre class="prettyprint">&lt;form action="/users/1" method="POST"&gt;
+    &lt;input type="hidden" name="_method" value="PUT" /&gt;
+    &lt;input type="hidden" name="authencity_token" value="qwertyuiop1234567890!@#$%^&amp;*()" /&gt;
+   &lt;p&gt;
+       &lt;label for="name"&gt;Username&lt;/label&gt;
+       &lt;input id="name" name="name" value="Anatoliy" /&gt;
+   &lt;/p&gt;
+   &lt;p&gt;
+       &lt;input type="submit" value="Save" /&gt;
+   &lt;/p&gt;        
+&lt;/form&gt;
+</pre>
+
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="span4">
+
+<ul>
+<li><code>form_tag</code></li>
+</ul>
+
+</div>
+
+<div class="span12">
+
+<p>This is "light" version of <code>form_for</code> helper. It accepts just two arguments: params and block. Block didn't receives any params.
+Use this helper when you have no any resource, but still want to be able to use simple method overriding and csrf protection tokens.
+<em>TODO: add code sample</em></p>
+
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="span4">
+
+<ul>
+<li><code>input_tag</code> and <code>form.input</code></li>
+</ul>
+
+</div>
+
+<div class="span12">
+
+<p>TODO: describe <code>input_tag</code></p>
+
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="span4">
+
+<ul>
+<li><code>label_tag</code> and <code>form.label</code></li>
+</ul>
+
+</div>
+
+<div class="span12">
+
+<p>TODO: describe <code>label_tag</code></p>
+
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="span4">
+
+<ul>
+<li><code>stylesheet_link_tag</code></li>
+</ul>
+
+</div>
+
+<div class="span12">
+
+<pre class="prettyprint">&lt;%- stylesheet_link_tag('reset', 'style', 'mobile') %&gt;
+</pre>
+
+<p>will generate</p>
+
+<pre class="prettyprint">&lt;link media="screen" rel="stylesheet" type="text/css" href="/stylesheets/reset.css?1306993455523" /&gt; 
+&lt;link media="screen" rel="stylesheet" type="text/css" href="/stylesheets/style.css?1306993455523" /&gt;
+</pre>
+
+<p>Timestamps <code>?1306993455523</code> added to assets only in development mode in order to prevent browser from caching scripts and style in client-side</p>
+
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="span4">
+
+<ul>
+<li><code>javascript_include_tag</code></li>
+</ul>
+
+</div>
+
+<div class="span12">
+
+<pre class="prettyprint">&lt;%- javascript_include_tag(
+  'https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js',
+  'rails', 'application') %&gt;
+</pre>
+
+<p>will generate</p>
+
+<pre class="prettyprint">&lt;script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"&gt;&lt;/script&gt; 
+&lt;script type="text/javascript" src="/javascripts/rails.js?1306993455524"&gt;&lt;/script&gt; 
+&lt;script type="text/javascript" src="/javascripts/application.js?1306993455524"&gt;&lt;/script&gt; 
+</pre>
+
+<p>Timestamps <code>?1306993455524</code> added to assets only in development mode in order to prevent browser from caching scripts and style in client-side</p>
+
+<p>By default railway expect assets to be located in <code>public/javascripts</code> and <code>public/stylesheets</code> directories, but this settings can be overwritten in <code>config/environment.js</code> file:</p>
+
+<pre class="prettyprint">app.set('jsDirectory', '/js/');
+app.set('cssDirectory', '/css/');
+</pre>
+
+</div>
+
+</div></section><div class="row"><div class="span8 offset4" id="disqus_thread"></div></div><script>$(function () {var disqus_shortname = 'railwayjs', disqus_identifier = "<%= page.path %>"; $.getScript("http://railwayjs.disqus.com/embed.js");})</script>
+</div>
+
+<footer class="footer">
+<div class="container">
+  <p class="pull-right"><a href="#">Back to top</a></p>
+  <p>
+    Documentation written by <a href="http://twitter.com/1602">@1602 (Anatoliy Chakkaev)</a>.<br/>
+    Designed and built with all the love in the world <a href="http://twitter.com/twitter" target="_blank">@twitter</a> by <a href="http://twitter.com/mdo" target="_blank">@mdo</a> and <a href="http://twitter.com/fat" target="_blank">@fat</a>.<br>
+    RailwayJS code licensed under the <a href="http://www.opensource.org/licenses/mit-license.php" target="_blank">MIT License</a>. Documentation licensed under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.
+  </p>
+</div>
+</footer>
+
+</html>

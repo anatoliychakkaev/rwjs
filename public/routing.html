@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>RailwayJS</title>
+
+    <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.3.0/bootstrap.min.css">
+    <link href="/javascripts/prettyprint/prettify.css" rel="stylesheet">
+
+    <script type="text/javascript" src="/javascripts/prettyprint/prettify.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script type="text/javascript" src="http://twitter.github.com/bootstrap/1.3.0/bootstrap-scrollspy.js"></script>
+    <script>$(function () { prettyPrint() })</script>
+
+    <style>
+      section {
+        padding-top: 60px;
+      }
+    </style>
+
+  </head>
+  <body style="padding-top: 60px">
+    <a href="http://github.com/1602/express-on-railway"><img style="position: fixed; top: 0; right: 0; border: 0;z-index: 10001;" src="https://d3nwyuy0nl342s.cloudfront.net/img/e6bef7a091f5f3138b8cd40bc3e114258dd68ddf/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub"></a>
+    <div class="topbar-wrapper" style="z-index: 5;">
+      <div class="topbar" data-scrollspy="scrollspy">
+        <div class="topbar-inner">
+          <div class="container">
+            <h3><a href="#">RailwayJS</a></h3>
+            <ul class="nav">
+              <li><a href="/about.html">About</a></li><li class="active"><a href="/routing.html">Routing</a></li><li><a href="/controller.html">Controller</a></li><li><a href="/views.html">Views</a></li><li><a href="/generators.html">Generators</a></li><li><a href="/console.html">Console</a></li><li><a href="/coffee.html">Coffee</a></li><li><a href="/localization.html">Localization</a></li><li><a href="/extensions.html">Extensions</a></li><li><a href="/heroku.html">Heroku</a></li>
+              <!--li class="dropdown">
+                <a href="#" class="dropdown-toggle">Features</a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">Extensions</a></li>
+                  <li><a href="#">Coffee</a></li>
+                  <li class="divider"></li>
+                  <li><a href="#">Contributing</a></li>
+                </ul>
+              </li-->
+            </ul>
+          </div>
+        </div><!-- /topbar-inner -->
+      </div><!-- /topbar -->
+    </div><!-- /topbar-wrapper -->
+
+<div class="container">
+  <h1 style="text-align: center; font-size: 250%; position: relative; top: 30px;"><span style="color: #a24;">RightwayJS - MVC framework</span><br/><small>Create NodeJS web apps faster with more energy, using RailwayJS</small></h1>
+
+  <section><div class="page-header">
+
+<h1>Routing</h1>
+
+</div>
+
+<div class="row">
+
+<div class="span4">
+
+<p>The purpose of routes is to connect URL with controller action. For example you can define the following route in <code>config/routes.js</code> file:</p>
+
+<pre class="prettyprint">map.get('signup', 'users#new');
+</pre>
+
+<p>to link <code>GET /signup</code> with <code>new</code> action of <code>users</code> controller.</p></p>
+
+<pre class="prettyprint">map.root('home#index');
+</pre>
+
+<p>Will link GET / to <code>index</code> action of <code>home</code> controller</p>
+
+</div>
+
+<div class="span12">
+
+<h3>Resource-based routing</h3>
+
+<p>Resource-based routing provides standart mapping between HTTP verbs and controller actions:</p>
+
+<pre class="prettyprint">map.resources('posts');
+</pre>
+
+<p>will provide following routes:</p>
+
+<pre class="prettyprint">   helper | method | path                   | controller#action
+---------------------------------------------------------------
+     posts GET      /posts                   posts#index
+     posts POST     /posts                   posts#create
+  new_post GET      /posts/new               posts#new
+ edit_post GET      /posts/:id/edit          posts#edit
+      post DELETE   /posts/:id               posts#destroy
+      post PUT      /posts/:id               posts#update
+      post GET      /posts/:id               posts#show
+</pre>
+
+<p>to list available routes you can run command <code>railway routes</code>.</p>
+
+<p>First column in table is <code>helper</code> - you can use this identifier in views and controllers to get route. Some examples:</p>
+
+<pre class="prettyprint">path_to.new_post            # /posts/new
+path_to.edit_post(1)        # /posts/1/edit
+path_to.edit_post(post)     # /posts/1/edit (in this example post = {id: 1})
+path_to.posts               # /posts
+path_to.post(post)          # /posts/1
+</pre>
+
+</div>
+
+</div>
+
+<h2>Aliases for resourceful routes</h2>
+
+<div class="row">
+
+<div class="span4">
+
+<p>If you want to override default routes behaviour, you can use two options:
+<code>as</code> and <code>path</code> to specify helper name and path you want to have in the result.</p>
+
+</div>
+
+<div class="span12">
+
+<h3>{ as: 'helperName' }</h3>
+
+<p>Path helper aliasing:</p>
+
+<pre class="prettyprint">map.resources('posts', {as: 'articles'});
+</pre>
+
+<p>will produce</p>
+
+<pre class="prettyprint">     articles GET    /posts.:format?          posts#index
+     articles POST   /posts.:format?          posts#create
+  new_article GET    /posts/new.:format?      posts#new
+ edit_article GET    /posts/:id/edit.:format? posts#edit
+      article DELETE /posts/:id.:format?      posts#destroy
+      article PUT    /posts/:id.:format?      posts#update
+      article GET    /posts/:id.:format?      posts#show
+</pre>
+
+<h3>{ path: 'alternatePath' }</h3>
+
+<p>If you want to change base path:</p>
+
+<pre class="prettyprint">map.resources('posts', {path: 'articles'});
+</pre>
+
+<p>this will create following routes:</p>
+
+<pre class="prettyprint">     posts GET    /articles.:format?          posts#index
+     posts POST   /articles.:format?          posts#create
+  new_post GET    /articles/new.:format?      posts#new
+ edit_post GET    /articles/:id/edit.:format? posts#edit
+      post DELETE /articles/:id.:format?      posts#destroy
+      post PUT    /articles/:id.:format?      posts#update
+      post GET    /articles/:id.:format?      posts#show
+</pre>
+
+<h3>all together</h3>
+
+<p>And if you want alias both helper and path, use both:</p>
+
+<pre class="prettyprint">map.resources('posts', {path: 'articles', as: 'stories'});
+</pre>
+
+<p>and you will get:</p>
+
+<pre class="prettyprint">    stories GET    /articles.:format?          posts#index
+    stories POST   /articles.:format?          posts#create
+  new_story GET    /articles/new.:format?      posts#new
+ edit_story GET    /articles/:id/edit.:format? posts#edit
+      story DELETE /articles/:id.:format?      posts#destroy
+      story PUT    /articles/:id.:format?      posts#update
+      story GET    /articles/:id.:format?      posts#show
+</pre>
+
+</div>
+
+</div>
+
+<h2>Nested resources</h2>
+
+<div class="row">
+
+<div class="span4">
+
+<p>Some resources may have nested sub-resources, for example <code>Post</code> has many <code>Comments</code>, and of course we want to get comments of the post using <code>GET /post/1/comments</code></p>
+
+</div>
+
+<div class="span12">
+
+<p>Let's describe route for nested resource</p>
+
+<pre class="prettyprint">map.resources('post', function (post) {
+    post.resources('comments');
+});
+</pre>
+
+<p>This routing map will provide the following routes:</p>
+
+<pre class="prettyprint">$ rw r
+     post_comments GET      /posts/:post_id/comments          comments#index
+     post_comments POST     /posts/:post_id/comments          comments#create
+  new_post_comment GET      /posts/:post_id/comments/new      comments#new
+ edit_post_comment GET      /posts/:post_id/comments/:id/edit comments#edit
+      post_comment DELETE   /posts/:post_id/comments/:id      comments#destroy
+      post_comment PUT      /posts/:post_id/comments/:id      comments#update
+      post_comment GET      /posts/:post_id/comments/:id      comments#show
+             posts GET      /posts                            posts#index
+             posts POST     /posts                            posts#create
+          new_post GET      /posts/new                        posts#new
+         edit_post GET      /posts/:id/edit                   posts#edit
+              post DELETE   /posts/:id                        posts#destroy
+              post PUT      /posts/:id                        posts#update
+              post GET      /posts/:id                        posts#show
+</pre>
+
+<h3>Using url helpers for nested routes</h3>
+
+<p>To use routes like <code>post_comments</code> you should call helper with param: parent resource or identifier before nested resource:</p>
+
+<pre class="prettyprint">path_to.post_comments(post)               # /posts/1/comments
+path_to.edit_post_comment(post, comment)  # /posts/1/comments/10/edit
+path_to.edit_post_comment(2, 300)         # /posts/2/comments/300/edit
+</pre>
+
+</div>
+
+</div>
+
+<h2>Namespaces</h2>
+
+<div class="row">
+
+<div class="span4">
+
+<p>You may wish to organize groups of controllers under a namespace. The most common use-case is Admin area. All controllers within <code>admin</code> namespace should be located inside <code>app/controllers/</code> dir.</p>
+
+</div>
+
+<div class="span12">
+
+<p>For example, let's create admin namespace:</p>
+
+<pre class="prettyprint">namespace('admin', function (admin) {
+    admin.resources('users');
+});
+</pre>
+
+<p>This routing rule will match with urls <code>/admin/users</code>, <code>admin/users/new</code>, and create appropriated url helpers</p>
+
+<pre class="prettyprint">      admin_users GET    /admin/users.:format?          admin/users#index
+      admin_users POST   /admin/users.:format?          admin/users#create
+   new_admin_user GET    /admin/users/new.:format?      admin/users#new
+  edit_admin_user GET    /admin/users/:id/edit.:format? admin/users#edit
+       admin_user DELETE /admin/users/:id.:format?      admin/users#destroy
+       admin_user PUT    /admin/users/:id.:format?      admin/users#update
+       admin_user GET    /admin/users/:id.:format?      admin/users#show
+</pre>
+
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="span8">
+
+<h2>Restricting routes</h2>
+
+<p>If you need routes only for several actions (e.g. <code>index</code>, <code>show</code>) you can specify <code>only</code> option:</p>
+
+<pre class="prettyprint">map.resources('users', {only: ['index', 'show']});
+</pre>
+
+<p>If you want to have all routes except some route, you can specify <code>except</code> option:</p>
+
+<pre class="prettyprint">map.resources('users', {except: ['create', 'destroy']});
+</pre>
+
+</div>
+
+<div class="span8">
+
+<h2>Custom actions in resourceful routes</h2>
+
+<p>If you need some specific action to be added to you resource-based route, use this example:</p>
+
+<pre class="prettyprint">map.resources('users', function (user) {
+    user.get('avatar', 'users#avatar');
+});
+</pre>
+
+</div>
+
+</div></section><div class="row"><div class="span8 offset4" id="disqus_thread"></div></div><script>$(function () {var disqus_shortname = 'railwayjs', disqus_identifier = "<%= page.path %>"; $.getScript("http://railwayjs.disqus.com/embed.js");})</script>
+</div>
+
+<footer class="footer">
+<div class="container">
+  <p class="pull-right"><a href="#">Back to top</a></p>
+  <p>
+    Documentation written by <a href="http://twitter.com/1602">@1602 (Anatoliy Chakkaev)</a>.<br/>
+    Designed and built with all the love in the world <a href="http://twitter.com/twitter" target="_blank">@twitter</a> by <a href="http://twitter.com/mdo" target="_blank">@mdo</a> and <a href="http://twitter.com/fat" target="_blank">@fat</a>.<br>
+    RailwayJS code licensed under the <a href="http://www.opensource.org/licenses/mit-license.php" target="_blank">MIT License</a>. Documentation licensed under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.
+  </p>
+</div>
+</footer>
+
+</html>
