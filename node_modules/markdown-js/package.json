@@ -1,0 +1,27 @@
+{ "name": "markdown-js"
+, "version": "0.0.3"
+, "keywords": [ "markdown", "md", "markup", "parser" ]
+, "description": "A port of markdown to JavaScript."
+, "author": "John Fraser"
+, "contributors":
+  [ "John Gruber"
+  , "George Moschovitis"
+  , "Kris Kowal"
+  , "Irakli Gozalishvili <rfobic@gmail.com> (http://jeditoolkit.com)"
+  ]
+, "directories":
+  { "lib": "./lib"
+  , "test": "./test"
+  }
+, "dependencies": { "test": ">=0.0.5" }
+, "engines":
+  { "node": ">=0.1.103"
+  , "teleport": ">=0.2.0"
+  }
+, "main": "./lib/markdown.js"
+, "scripts": { "test": "node test/all.js" }
+, "repository":
+  { "type": "git"
+  , "url": "git://github.com/Gozala/markdown-js.git"
+  }
+}
