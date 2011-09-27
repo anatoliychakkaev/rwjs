@@ -5,8 +5,6 @@
 
     <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.3.0/bootstrap.min.css">
     <link href="/javascripts/prettyprint/prettify.css" rel="stylesheet">
-    <meta name="description" content="RailwayJS - MVC framework for NodeJS, inspired by Ruby On Rails, fully ExpressJS compatible" >
-    <meta name="keywords" content="nodejs, ror, rails, mvc, expressjs, framework, javascript, ruby on rails, async" >
 
     <script type="text/javascript" src="/javascripts/prettyprint/prettify.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
@@ -28,7 +26,7 @@
           <div class="container">
             <h3><a href="#">RailwayJS</a></h3>
             <ul class="nav">
-              HEADER
+              <li><a href="/about.html">About</a></li><li><a href="/routing.html">Routing</a></li><li><a href="/controller.html">Controller</a></li><li><a href="/views.html">Views</a></li><li><a href="/generators.html">Generators</a></li><li><a href="/console.html">Console</a></li><li><a href="/coffee.html">Coffee</a></li><li><a href="/localization.html">Localization</a></li><li><a href="/extensions.html">Extensions</a></li><li><a href="/heroku.html">Heroku</a></li><li class="active"><a href="/snippets.html">Snippets</a></li>
               <!--li class="dropdown">
                 <a href="#" class="dropdown-toggle">Features</a>
                 <ul class="dropdown-menu">
@@ -47,7 +45,106 @@
 <div class="container">
   <h1 style="text-align: center; font-size: 250%; position: relative; top: 30px;"><span style="color: #a24;">RightwayJS - MVC framework</span><br/><small>Create NodeJS web apps faster with more energy, using RailwayJS</small></h1>
 
-  SECTIONS
+  <section><div class="page-header">
+
+<h1>Code snippets <small>Useful pieces of code</small></h1>
+
+</div>
+
+<h2>Redis session store for Heroku deployment with redistogo addon</h2>
+
+<div class="row">
+
+<div class="span4">
+
+<p>Hook <code>REDISTOGO_URL</code> environment variable in
+<code>config/environment.js</code> and pass it to RedisStore constructor.</p>
+
+</div>
+
+<div class="span8">
+
+<pre class="prettyprint">var express    = require('express'),
+    RedisStore = require('connect-redis')(express);
+
+var redisOpts;
+if (process.env['REDISTOGO_URL']) {
+    var url = require('url').parse(process.env['REDISTOGO_URL']);
+    var redisOpts = {
+        port: url.port,
+        host: url.hostname,
+        pass: url.auth.split(':')[1]
+    };
+} else {
+    redisOpts = {};
+}
+
+app.configure(function(){
+    var cwd = process.cwd();
+    app.use(express.static(cwd + '/public', {maxAge: 86400000}));
+    app.set('views', cwd + '/app/views');
+    app.set('view engine', 'ejs');
+    app.set('jsDirectory', '/javascripts/');
+    app.set('cssDirectory', '/css/');
+    app.use(express.bodyParser());
+    app.use(express.cookieParser());
+    app.use(express.session({secret: 'secret', store: new RedisStore(redisOpts)}));
+    app.use(express.methodOverride());
+    app.use(app.router);
+});
+</pre>
+
+</div>
+
+</div>
+
+<h2>Upload file to railway server</h2>
+
+<div class="row">
+
+<div class="span4">
+
+<ul>
+<li><a href="http://groups.google.com/group/railwayjs/browse_thread/thread/592df72830898e9a">Discussion in google group</a></li>
+<li>The solution is to use <a href="https://github.com/anatoliychakkaev/connect-form-sync">this middleware</a></li>
+<li>Check out <a href="https://github.com/anatoliychakkaev/railway-example-upload">example app</a></li>
+</ul>
+
+</div>
+
+<div class="span8">
+
+<pre class="prettyprint">var form = require('connect-form-sync');
+app.configure(function(){
+    ....
+    app.use(form({ keepExtensions: true }));
+    app.use(express.bodyParser());
+    ....
+});
+</pre>
+
+<p>and use in controller like that:</p>
+
+<pre class="prettyprint">action('create', function () {
+    this.file = new File();
+    var tmpFile = req.form.files.file;
+    this.file.upload(tmpFile.name, tmpFile.path, function (err) {
+        if (err) {
+            console.log(err);
+            this.title = 'New file';
+            flash('error', 'File can not be created');
+            render('new');
+        } else {
+            flash('info', 'File created');
+            redirect(path_to.files);
+        }
+    }.bind(this));
+});
+</pre>
+
+</div>
+
+</div></section><div class="row"><div class="span8 offset4" id="disqus_thread"></div></div><script>$(function () {var disqus_shortname = 'railwayjs', disqus_identifier = "<%= page.path %>"; $.getScript("http://railwayjs.disqus.com/embed.js");})</script>
 </div>
 
 <footer class="footer">
