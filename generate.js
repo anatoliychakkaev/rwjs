@@ -18,6 +18,7 @@ module.exports = function () {
         'Localization',
         'Extensions',
         'Heroku',
+        'Snippets'
     ];
 
     sections.forEach(function (section) {
