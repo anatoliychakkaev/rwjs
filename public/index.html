@@ -28,7 +28,7 @@
           <div class="container">
             <h3><a href="#">RailwayJS</a></h3>
             <ul class="nav">
-              <li><a href="#about">About</a></li><li><a href="#routing">Routing</a></li><li><a href="#controller">Controller</a></li><li><a href="#views">Views</a></li><li><a href="#generators">Generators</a></li><li><a href="#console">Console</a></li><li><a href="#coffee">Coffee</a></li><li><a href="#localization">Localization</a></li><li><a href="#extensions">Extensions</a></li><li><a href="#heroku">Heroku</a></li><li><a href="#snippets">Snippets</a></li>
+              <li><a href="#routing">Routing</a></li><li><a href="#controller">Controller</a></li><li><a href="#views">Views</a></li><li><a href="#orm">ORM</a></li><li><a href="#generators">Generators</a></li><li><a href="#console">Console</a></li><li><a href="#coffee">Coffee</a></li><li><a href="#localization">Localization</a></li><li><a href="#extensions">Extensions</a></li><li><a href="#heroku">Heroku</a></li><li><a href="#snippets">Snippets</a></li>
               <li><a href="#tip">Tip</a></li>
               <!--li class="dropdown">
                 <a href="#" class="dropdown-toggle">Features</a>
@@ -46,7 +46,7 @@
     </div><!-- /topbar-wrapper -->
 
 <div class="container">
-  <h1 style="text-align: center; font-size: 250%; position: relative; top: 30px;"><span style="color: #a24;">RightwayJS - MVC framework</span><br/><small>Create NodeJS web apps faster with more energy, using RailwayJS</small></h1>
+  <h1 style="text-align: center; font-size: 250%; position: relative; top: 30px;"><span style="color: #a24;">RightwayJS - MVC framework</span><br/><small>Create NodeJS web apps faster with more energy, using RailwayJS</small><small><br/><strong style="color:#a24">BREAKING NEWS:</strong> JugglingDB coming soon, checkout <a href="https://github.com/1602/express-on-railway/tree/develop">develop</a> branch, read <a href="#orm">docs</a></small></h1>
 
   
 <section id="about"><div class="page-header">
@@ -915,6 +915,156 @@ app.set('cssDirectory', '/css/');
 </div>
 
 </div></section>
+
+<section id="orm"><div class="page-heading">
+
+<h1>Meet ORM: JugglingDB <small>sorf of documentation driven development</small></h1>
+
+</div>
+
+<p><strong>NOTE:</strong> features described in section below are only available on develop branch, and some features are not implemented fully.</p>
+
+<h2>1. Configure database</h2>
+
+<div class="row">
+
+<div class="span4">
+
+Describe which database adapter you going to use and how to connect with database in `config/database.json` file
+</div>
+
+<div class="span6">
+
+<pre class="prettyprint">{ "development":
+  { "driver":   "redis"
+  , "host":     "localhost"
+  , "port":     6379
+  }
+, "test":
+  { "driver":   "memory"
+  }
+, "staging":
+  { "driver":   "mongoose"
+  , "url":      "mongodb://localhost/test"
+  }
+, "production":
+  { "driver":   "sequelize"
+  , "host":     "localhost"
+  , "post":     3306
+  , "database": "nodeapp-production"
+  , "username": "nodeapp-prod",
+  , "password": "t0ps3cr3t"
+  }
+}
+</pre>
+
+</div>
+
+<div class="span6">
+
+<p>Checkout list of available adapters in <a href="https://github.com/1602/jugglingdb/blob/master/test/common_test.js">this test</a>. Also possible to specify which database to use to directly in schema, using <code>schema</code> method:</p>
+
+<pre class="prettyprint">schema 'redis', url: process.env.REDISTOGO_URL, -&gt;
+    define 'User'
+    # other definitions for redis schema
+
+schema 'mongoose', url: process.env.MONGOHQ_URL, -&gt;
+    define 'Post'
+    # other definitions for mongoose schema
+</pre>
+
+<p>All of this schemas will work at the same time, and you even can describe relationships between different schemas, such as <code>User.hasMany(Post)</code>, cool, eh? This is why it called JugglingDB.</p>
+
+</div>
+
+</div>
+
+<h2>2. Define schema</h2>
+
+<div class="row">
+
+<div class="span4">
+
+<p>Use <code>define</code> method to describe database entities, and <code>property</code> method to specify types of fields.
+This method acceps following arguments:</p>
+
+<ul>
+<li>name of property</li>
+<li>type: Date, Number, Boolean, Text, String (can be omitted if String)</li>
+<li>options: Object {default: 'default value', index: true}</li>
+</ul>
+
+</div>
+
+<div class="span6">
+
+<p>javascript: <code>db/schema.js</code></p>
+
+<pre class="prettyprint">var Person = define('Person', function () {
+    property('email', {index: true});
+    property('active', Boolean, {default: true});
+    property('createdAt', Date);
+});
+
+var Book = define('Book', function () {
+    property('title');
+    property('ISBN');
+});
+</pre>
+
+</div>
+
+<div class="span6">
+
+<p>coffeescript: <code>db/schema.coffee</code></p>
+
+<pre class="prettyprint">Person = define 'Person', -&gt;
+    property 'email', index: true
+    property 'active', Boolean, default: true
+    property 'createdAt', Date, default: Date
+    property 'bio', Text
+    property 'name'
+
+Book = define 'Book', -&gt;
+    property 'title'
+    property 'ISBN'
+</pre>
+
+</div>
+
+</div>
+
+<h2>3. Describe relations</h2>
+
+<div class="row">
+
+<div class="span6">
+
+</div>
+
+</div>
+
+<h2>4. Setup validations</h2>
+
+<div class="row">
+
+<div class="span6">
+
+</div>
+
+</div>
+
+<h2>5. Just use your models, don't think about databases</h2>
+
+<div class="row">
+
+<div class="span6">
+
+</div>
+
+</div>
+
+<h2>6. Think about databases: use their's power at 110%</h2></section>
 
 <section id="generators"><div class="page-header">
 

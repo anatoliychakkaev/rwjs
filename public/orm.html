@@ -28,7 +28,7 @@
           <div class="container">
             <h3><a href="#">RailwayJS</a></h3>
             <ul class="nav">
-              <li><a href="/about.html">About</a></li><li><a href="/routing.html">Routing</a></li><li><a href="/controller.html">Controller</a></li><li><a href="/views.html">Views</a></li><li><a href="/orm.html">ORM</a></li><li><a href="/generators.html">Generators</a></li><li><a href="/console.html">Console</a></li><li><a href="/coffee.html">Coffee</a></li><li class="active"><a href="/localization.html">Localization</a></li><li><a href="/extensions.html">Extensions</a></li><li><a href="/heroku.html">Heroku</a></li><li><a href="/snippets.html">Snippets</a></li>
+              <li><a href="/about.html">About</a></li><li><a href="/routing.html">Routing</a></li><li><a href="/controller.html">Controller</a></li><li><a href="/views.html">Views</a></li><li class="active"><a href="/orm.html">ORM</a></li><li><a href="/generators.html">Generators</a></li><li><a href="/console.html">Console</a></li><li><a href="/coffee.html">Coffee</a></li><li><a href="/localization.html">Localization</a></li><li><a href="/extensions.html">Extensions</a></li><li><a href="/heroku.html">Heroku</a></li><li><a href="/snippets.html">Snippets</a></li>
               <li><a href="#tip">Tip</a></li>
               <!--li class="dropdown">
                 <a href="#" class="dropdown-toggle">Features</a>
@@ -48,107 +48,155 @@
 <div class="container">
   <h1 style="text-align: center; font-size: 250%; position: relative; top: 30px;"><span style="color: #a24;">RightwayJS - MVC framework</span><br/><small>Create NodeJS web apps faster with more energy, using RailwayJS</small><small><br/><strong style="color:#a24">BREAKING NEWS:</strong> JugglingDB coming soon, checkout <a href="https://github.com/1602/express-on-railway/tree/develop">develop</a> branch, read <a href="#orm">docs</a></small></h1>
 
-  <section><div class="page-header">
+  <section><div class="page-heading">
 
-<h1>Localization <small>How to build multi-language apps</small></h1>
+<h1>Meet ORM: JugglingDB <small>sorf of documentation driven development</small></h1>
 
 </div>
+
+<p><strong>NOTE:</strong> features described in section below are only available on develop branch, and some features are not implemented fully.</p>
+
+<h2>1. Configure database</h2>
 
 <div class="row">
 
 <div class="span4">
 
-<p>Basic steps:</p>
-
-<ol>
-<li>create dictionary to translate tokens to natural language (<code>config/locales/*.yml</code>)</li>
-<li>Use tokens instead of natural language everywhere in app (<code>t</code> helper)</li>
-<li>Manually detect language of each user request (<code>setLocale</code> method)</li>
-</ol>
-
+Describe which database adapter you going to use and how to connect with database in `config/database.json` file
 </div>
 
-<div class="span8">
+<div class="span6">
 
-<p>Railway allows you to create application translated to different languages: just place localization file in <code>yaml</code> format to <code>config/locales</code> dir:</p>
-
-<p><code>config/locales/en.yml</code></p>
-
-<pre class="prettyprint">en:
-  session:
-    new: "Sign in"
-    destroy: "Sign out"
-  user:
-    new: "Sign up"
-    destroy: "Cancel my account"
-    welcome: "Hello %, howdy?
-    validation:
-      name: "Username required"
-</pre>
-
-<p>NOTE: translations can contain <code>%</code> symbol(s), that means variable substitution</p>
-
-<p>Define user locale in application controller:</p>
-
-<p><code>app/controllers/application_controller.js</code></p>
-
-<pre class="prettyprint">before(setUserLocale);
-function setUserLocale () {
-    // define locale from user settings, or from headers or use default
-    var locale = req.user ? req.user.locale : 'en';
-    // call global function setLocale
-    setLocale(locale);
+<pre class="prettyprint">{ "development":
+  { "driver":   "redis"
+  , "host":     "localhost"
+  , "port":     6379
+  }
+, "test":
+  { "driver":   "memory"
+  }
+, "staging":
+  { "driver":   "mongoose"
+  , "url":      "mongodb://localhost/test"
+  }
+, "production":
+  { "driver":   "sequelize"
+  , "host":     "localhost"
+  , "post":     3306
+  , "database": "nodeapp-production"
+  , "username": "nodeapp-prod",
+  , "password": "t0ps3cr3t"
+  }
 }
 </pre>
 
-<p>and use localized tokens inside app views with <code>t</code> helper:</p>
+</div>
 
-<pre class="prettyprint">&lt;%= t('session.new') %&gt;
-&lt;%= t('user.new') %&gt;
-&lt;%= t(['user.welcome', user.name]) %&gt;
+<div class="span6">
+
+<p>Checkout list of available adapters in <a href="https://github.com/1602/jugglingdb/blob/master/test/common_test.js">this test</a>. Also possible to specify which database to use to directly in schema, using <code>schema</code> method:</p>
+
+<pre class="prettyprint">schema 'redis', url: process.env.REDISTOGO_URL, -&gt;
+    define 'User'
+    # other definitions for redis schema
+
+schema 'mongoose', url: process.env.MONGOHQ_URL, -&gt;
+    define 'Post'
+    # other definitions for mongoose schema
 </pre>
 
-<p>or inside controllers:</p>
+<p>All of this schemas will work at the same time, and you even can describe relationships between different schemas, such as <code>User.hasMany(Post)</code>, cool, eh? This is why it called JugglingDB.</p>
 
-<pre class="prettyprint">flash('error', t('user.validation.name'));
-</pre>
+</div>
 
-<p>or inside models:</p>
+</div>
 
-<pre class="prettyprint">return t('email.activate', 'en');
-</pre>
+<h2>2. Define schema</h2>
 
-<p>NOTE: when use t helpers inside models you must pass <code>locale</code> as second param to <code>t</code> helper.</p>
+<div class="row">
 
-<h2>Configuration</h2>
+<div class="span4">
 
-<p>Localization behavior can be configured using following settings:</p>
+<p>Use <code>define</code> method to describe database entities, and <code>property</code> method to specify types of fields.
+This method acceps following arguments:</p>
 
 <ul>
-<li>defaultLocale: name of default locale</li>
-<li>translationMissing: what action perfor when translation is missing, possible values: <code>default</code> - display translation for default locale, <code>display</code> - show error like "Translation missing for email.activate"</li>
+<li>name of property</li>
+<li>type: Date, Number, Boolean, Text, String (can be omitted if String)</li>
+<li>options: Object {default: 'default value', index: true}</li>
 </ul>
 
-<p>Example:</p>
+</div>
 
-<pre class="prettyprint">app.configure(function () {
-    app.set('defaultLocale', 'en');
+<div class="span6">
+
+<p>javascript: <code>db/schema.js</code></p>
+
+<pre class="prettyprint">var Person = define('Person', function () {
+    property('email', {index: true});
+    property('active', Boolean, {default: true});
+    property('createdAt', Date);
 });
 
-app.configure('development', function(){
-    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-    app.set('translationMissing', 'display');
-});
-
-app.configure('production', function () {
-    app.use(express.errorHandler()); 
-    app.set('translationMissing', 'default');
+var Book = define('Book', function () {
+    property('title');
+    property('ISBN');
 });
 </pre>
 
 </div>
 
-</div></section><div class="row"><div class="span8 offset4" id="disqus_thread"></div></div><script>$(function () {var disqus_shortname = 'railwayjs', disqus_identifier = "<%= page.path %>"; $.getScript("http://railwayjs.disqus.com/embed.js");})</script>
+<div class="span6">
+
+<p>coffeescript: <code>db/schema.coffee</code></p>
+
+<pre class="prettyprint">Person = define 'Person', -&gt;
+    property 'email', index: true
+    property 'active', Boolean, default: true
+    property 'createdAt', Date, default: Date
+    property 'bio', Text
+    property 'name'
+
+Book = define 'Book', -&gt;
+    property 'title'
+    property 'ISBN'
+</pre>
+
+</div>
+
+</div>
+
+<h2>3. Describe relations</h2>
+
+<div class="row">
+
+<div class="span6">
+
+</div>
+
+</div>
+
+<h2>4. Setup validations</h2>
+
+<div class="row">
+
+<div class="span6">
+
+</div>
+
+</div>
+
+<h2>5. Just use your models, don't think about databases</h2>
+
+<div class="row">
+
+<div class="span6">
+
+</div>
+
+</div>
+
+<h2>6. Think about databases: use their's power at 110%</h2></section><div class="row"><div class="span8 offset4" id="disqus_thread"></div></div><script>$(function () {var disqus_shortname = 'railwayjs', disqus_identifier = "<%= page.path %>"; $.getScript("http://railwayjs.disqus.com/embed.js");})</script>
 </div>
 
 <footer class="footer">

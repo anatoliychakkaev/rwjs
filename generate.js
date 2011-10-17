@@ -12,6 +12,7 @@ module.exports = function () {
         'Routing',
         'Controller',
         'Views',
+        'ORM',
         'Generators',
         'Console',
         'Coffee',
@@ -34,7 +35,9 @@ module.exports = function () {
         // html += '<h6><a href="/' + sectionId + '.html#disqus_thread">Discuss on #' + sectionId + '</a></h6>';
         html += '</section>\n';
 
-        header += '<li><a href="#' + sectionId + '">' + section + '</a></li>';
+        if (section !== 'About') {
+            header += '<li><a href="#' + sectionId + '">' + section + '</a></li>';
+        }
 
         var headerSA = '';
         sections.forEach(function (sec) {
