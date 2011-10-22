@@ -46,7 +46,7 @@
     </div><!-- /topbar-wrapper -->
 
 <div class="container">
-  <h1 style="text-align: center; font-size: 250%; position: relative; top: 30px;"><span style="color: #a24;">RightwayJS - MVC framework</span><br/><small>Create NodeJS web apps faster with more energy, using RailwayJS</small><small><br/><strong style="color:#a24">BREAKING NEWS:</strong> JugglingDB coming soon, checkout <a href="https://github.com/1602/express-on-railway/tree/develop">develop</a> branch, read <a href="#orm">docs</a></small></h1>
+  <h1 style="text-align: center; font-size: 250%; position: relative; top: 30px;"><span style="color: #a24;">RailwayJS - MVC framework</span><br/><small>Create NodeJS web apps faster with more energy, using RailwayJS</small><small><br/><strong style="color:#a24">BREAKING NEWS:</strong> JugglingDB coming soon, checkout <a href="https://github.com/1602/express-on-railway/tree/develop">develop</a> branch, read <a href="#orm">docs</a></small></h1>
 
   <section><div class="page-heading">
 
@@ -170,7 +170,45 @@ Book = define 'Book', -&gt;
 
 <div class="row">
 
+<div class="span4">
+
+<pre class="prettyprint">Currently supported only few relations: hasMany, belongsTo,
+of course set of possible relations between object will grow
+</pre>
+
+</div>
+
 <div class="span6">
+
+<pre class="prettyprint">User.hasMany(Post,   {as: 'posts',  foreignKey: 'userId'});
+// creates instance methods:
+// user.posts(conds)
+// user.posts.build(data) // like new Post({userId: user.id});
+// user.posts.create(data) // build and save
+// user.posts.find
+
+Post.belongsTo(User, {as: 'author', foreignKey: 'userId'});
+// creates instance methods:
+// post.author(callback) -- getter when called with function
+// post.author() -- sync getter when called without params
+// post.author(user) -- setter when called with object
+</pre>
+
+<p>It also possible to use scopes inside has many associations,
+for example if you have scope for <code>Post</code>:</p>
+
+<pre class="prettyprint">Post.scope('published', {published: true})
+</pre>
+
+<p>which is primarily just creates shortcut caller for <code>all</code> method:</p>
+
+<pre class="prettyprint">Post.published(cb) // same as Post.all({published: true});
+</pre>
+
+<p>So, you can use it with association:</p>
+
+<pre class="prettyprint">user.posts.published(cb); // same as Post.all({published: true, userId: user.id});
+</pre>
 
 </div>
 
@@ -180,7 +218,165 @@ Book = define 'Book', -&gt;
 
 <div class="row">
 
-<div class="span6">
+<div class="span4">
+
+<p>Currenty supported validations:</p>
+
+<ul>
+<li>presence</li>
+<li>length</li>
+<li>numericality</li>
+<li>inclusion</li>
+<li>exclusion</li>
+<li>format</li>
+</ul>
+
+</div>
+
+<div class="span10">
+
+<p>Validations invoked after <code>create</code>, <code>save</code> and <code>updateAttributes</code>, it also possible to skip validations when use <code>save</code> method:</p>
+
+<pre class="prettyprint">obj.save({validate: false});
+</pre>
+
+<p>Validations can be called manually using <code>isValid</code> method of object</p>
+
+<p>Normally all validations result in <code>errors</code> member of object, which is a hash of arrays of error messages:</p>
+
+<pre class="prettyprint">obj.errors 
+{
+    email: [
+        'can\'t be blank',
+        'format is invalid'
+    ],
+    password: [ 'too short' ]
+}
+</pre>
+
+<p>It also can raise exception, if you want, just pass <code>throws: true</code> as param of <code>save</code> method:</p>
+
+<pre class="prettyprint">// be carefull, now it will throw Error object
+obj.save({throws: true});
+</pre>
+
+<p>To setup validation, call it configurator on class:</p>
+
+<pre class="prettyprint">Person.validatesPresenceOf('email', 'name')
+Person.validatesLengthOf('password', {min: 5})
+</pre>
+
+<p>Each configurator accepts set of string arguments, and one optional last argument, which is actually specify how validator should work, of course it depends on each validator, but there's few common options:</p>
+
+<ul>
+<li>if</li>
+<li>unless</li>
+<li>message</li>
+<li>allowNull</li>
+<li>allowBlank</li>
+</ul>
+
+<p><code>if</code> and <code>unless</code> methods is for skipping validations depending on conditions, it can be function, or string. Function invoked in context of object, where validation performed. If string passed, then one of object's member checked.</p>
+
+<p><code>message</code> member allows to configure error message, it can be string or object (depends on validator), see usage examples</p>
+
+<p><code>allowNull</code> and <code>allowBlank</code> is self explanatory :)</p>
+
+<p>Examples of different types of validations:</p>
+
+<h6>length</h6>
+
+<pre class="prettyprint">User.validatesLengthOf 'password', min: 3, max: 10, allowNull: true
+User.validatesLengthOf 'state', is: 2, allowBlank: true
+user = new User validAttributes
+
+user.password = 'qw'
+test.ok not user.isValid(), 'Invalid: too short'
+test.equal user.errors.password[0], 'too short'
+
+user.password = '12345678901'
+test.ok not user.isValid(), 'Invalid: too long'
+test.equal user.errors.password[0], 'too long'
+
+user.password = 'hello'
+test.ok user.isValid(), 'Valid with value'
+test.ok not user.errors
+
+user.password = null
+test.ok user.isValid(), 'Valid without value'
+test.ok not user.errors
+
+user.state = 'Texas'
+test.ok not user.isValid(), 'Invalid state'
+test.equal user.errors.state[0], 'length is wrong'
+
+user.state = 'TX'
+test.ok user.isValid(), 'Valid with value of state'
+test.ok not user.errors
+</pre>
+
+<h6>numericality</h6>
+
+<pre class="prettyprint">User.validatesNumericalityOf 'age', int: true
+user = new User validAttributes
+
+user.age = '26'
+test.ok not user.isValid(), 'User is not valid: not a number'
+test.equal user.errors.age[0], 'is not a number'
+
+user.age = 26.1
+test.ok not user.isValid(), 'User is not valid: not integer'
+test.equal user.errors.age[0], 'is not an integer'
+
+user.age = 26
+test.ok user.isValid(), 'User valid: integer age'
+test.ok not user.errors
+</pre>
+
+<h6>inclusion</h6>
+
+<pre class="prettyprint">User.validatesInclusionOf 'gender', in: ['male', 'female']
+user = new User validAttributes
+
+user.gender = 'any'
+test.ok not user.isValid()
+test.equal user.errors.gender[0], 'is not included in the list'
+
+user.gender = 'female'
+test.ok user.isValid()
+
+user.gender = 'male'
+test.ok user.isValid()
+
+user.gender = 'man'
+test.ok not user.isValid()
+test.equal user.errors.gender[0], 'is not included in the list'
+</pre>
+
+<h6>exclution</h6>
+
+<pre class="prettyprint">User.validatesExclusionOf 'domain', in: ['www', 'admin']
+user = new User validAttributes
+
+user.domain = 'www'
+test.ok not user.isValid()
+test.equal user.errors.domain[0], 'is reserved'
+
+user.domain = 'my'
+test.ok user.isValid()
+</pre>
+
+<h6>format</h6>
+
+<pre class="prettyprint">User.validatesFormatOf 'email', with: /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/i
+user = new User validAttributes
+
+user.email = 'invalid email'
+test.ok not user.isValid()
+
+user.email = 'valid@email.tld'
+test.ok user.isValid()
+</pre>
 
 </div>
 
@@ -190,13 +386,29 @@ Book = define 'Book', -&gt;
 
 <div class="row">
 
+<div class="span4">
+
+</div>
+
 <div class="span6">
 
 </div>
 
 </div>
 
-<h2>6. Think about databases: use their's power at 110%</h2></section><div class="row"><div class="span8 offset4" id="disqus_thread"></div></div><script>$(function () {var disqus_shortname = 'railwayjs', disqus_identifier = "<%= page.path %>"; $.getScript("http://railwayjs.disqus.com/embed.js");})</script>
+<h2>6. Think about databases: use power of each specific database at 110%</h2>
+
+<div class="row">
+
+<div class="span4">
+
+</div>
+
+<div class="span6">
+
+</div>
+
+</div></section><div class="row"><div class="span8 offset4" id="disqus_thread"></div></div><script>$(function () {var disqus_shortname = 'railwayjs', disqus_identifier = "<%= page.path %>"; $.getScript("http://railwayjs.disqus.com/embed.js");})</script>
 </div>
 
 <footer class="footer">
