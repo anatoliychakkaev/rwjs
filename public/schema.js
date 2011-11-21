@@ -368,18 +368,7 @@ function Schema(name, settings) {
     // and initialize schema using adapter
     // this is only one initialization entry point of adapter
     // this module should define `adapter` member of `this` (schema)
-    var adapter;
-    if (name === 'memory') {
-        adapter = require('./adapters/memory.js');
-    } else if (path.existsSync(__dirname + '/adapters/' + name + '.js')) {
-        adapter = require('./adapters/' + name);
-    } else {
-        try {
-            adapter = require(name);
-        } catch (e) {
-            throw new Error('Adapter ' + name + ' is not defined, try\n  npm install ' + name);
-        }
-    }
+    var adapter = require('./adapters/memory.js');
 
     adapter.initialize(this, function () {
         this.connected = true;
@@ -529,12 +518,14 @@ require.define("/node_modules/jugglingdb/lib/abstract-class.js", function (requi
  * Module deps
  */
 var Validatable = require('./validatable').Validatable;
+var Hookable = require('./hookable').Hookable;
 var util = require('util');
 var jutil = require('./jutil');
 
 exports.AbstractClass = AbstractClass;
 
 jutil.inherits(AbstractClass, Validatable);
+jutil.inherits(AbstractClass, Hookable);
 
 /**
  * Abstract class constructor
@@ -606,6 +597,8 @@ function AbstractClass(data) {
             return null;
         }
     }
+
+    this.trigger("initialize");
 };
 
 /**
@@ -630,25 +623,35 @@ AbstractClass.create = function (data) {
     if (data instanceof AbstractClass && !data.id) {
         obj = data;
         data = obj.toObject(true);
+        create();
     } else {
         obj = new this(data);
 
         // validation required
-        if (!obj.isValid()) {
-            return callback(new Error('Validation error'), obj);
-        }
+        obj.isValid(function (valid) {
+            if (!valid) {
+                callback(new Error('Validation error'), obj);
+            } else {
+                create();
+            }
+        });
     }
 
-    this.schema.adapter.create(modelName, data, function (err, id) {
-        if (id) {
-            defineReadonlyProp(obj, 'id', id);
-            this.cache[id] = obj;
-        }
-        if (callback) {
-            callback(err, obj);
-        }
-    }.bind(this));
-
+    function create() {
+        obj.trigger('create', function (done) {
+            this._adapter().create(modelName, data, function (err, id) {
+                if (id) {
+                    defineReadonlyProp(obj, 'id', id);
+                    this.constructor.cache[id] = obj;
+                }
+                done.call(this, function () {
+                    if (callback) {
+                        callback(err, obj);
+                    }
+                });
+            }.bind(this));
+        });
+    }
 };
 
 AbstractClass.exists = function exists(id, cb) {
@@ -726,6 +729,8 @@ AbstractClass.toString = function () {
 }
 
 /**
+ * Save instance. When instance haven't id, create method called instead.
+ * Triggers: validate, save, update | create
  * @param options {validate: true, throws: false} [optional]
  * @param callback(err, obj)
  */
@@ -734,34 +739,63 @@ AbstractClass.prototype.save = function (options, callback) {
         callback = options;
         options = {};
     }
+
+    callback = callback || function () {};
+    options = options || {};
+
     if (!('validate' in options)) {
         options.validate = true;
     }
     if (!('throws' in options)) {
         options.throws = false;
     }
-    if (options.validate && !this.isValid()) {
-        var err = new Error('Validation error');
-        if (options.throws) {
-            throw err;
-        }
-        return callback && callback(err);
-    }
-    var modelName = this.constructor.modelName;
-    var data = this.toObject(true);
-    if (this.id) {
-        this._adapter().save(modelName, data, function (err) {
-            if (err) {
-                console.log(err);
+
+    if (options.validate) {
+        this.isValid(function (valid) {
+            if (valid) {
+                save.call(this);
             } else {
-                this.constructor.call(this, data);
-            }
-            if (callback) {
+                var err = new Error('Validation error');
+                // throws option is dangerous for async usage
+                if (options.throws) {
+                    throw err;
+                }
                 callback(err, this);
             }
         }.bind(this));
     } else {
-        this.constructor.create(this, callback);
+        save.call(this);
+    }
+
+    function save() {
+        this.trigger('save', function (saveDone) {
+            var modelName = this.constructor.modelName;
+            var data = this.toObject(true);
+            var inst = this;
+            if (inst.id) {
+                inst.trigger('update', function (updateDone) {
+                    inst._adapter().save(modelName, data, function (err) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            inst.constructor.call(inst, data);
+                        }
+                        updateDone.call(inst, function () {
+                            saveDone.call(inst, function () {
+                                callback(err, inst);
+                            });
+                        });
+                    });
+                });
+            } else {
+                inst.constructor.create(inst, function (err) {
+                    saveDone.call(inst, function () {
+                        callback(err, inst);
+                    });
+                });
+            }
+
+        });
     }
 };
 
@@ -789,10 +823,14 @@ AbstractClass.prototype.toObject = function (onlySchema) {
 };
 
 AbstractClass.prototype.destroy = function (cb) {
-    this._adapter().destroy(this.constructor.modelName, this.id, function (err) {
-        delete this.constructor.cache[this.id];
-        cb && cb(err);
-    }.bind(this));
+    this.trigger('destroy', function (destroyed) {
+        this._adapter().destroy(this.constructor.modelName, this.id, function (err) {
+            delete this.constructor.cache[this.id];
+            destroyed(function () {
+                cb && cb(err);
+            });
+        }.bind(this));
+    });
 };
 
 AbstractClass.prototype.updateAttribute = function (name, value, cb) {
@@ -802,28 +840,51 @@ AbstractClass.prototype.updateAttribute = function (name, value, cb) {
 };
 
 AbstractClass.prototype.updateAttributes = function updateAttributes(data, cb) {
+    var inst = this;
     var model = this.constructor.modelName;
     Object.keys(data).forEach(function (key) {
         this[key] = data[key];
     }.bind(this));
-    if (!this.isValid()) {
-        var err = new Error('Validation error');
-        return cb && cb(err);
-    }
-    this._adapter().updateAttributes(model, this.id, data, function (err) {
-        if (!err) {
-            Object.keys(data).forEach(function (key) {
-                this[key] = data[key];
-                Object.defineProperty(this, key + '_was', {
-                    writable:     false,
-                    configurable: true,
-                    enumerable:   false,
-                    value:        data[key]
-                });
-            }.bind(this));
+
+    this.isValid(function (valid) {
+        if (!valid) {
+            if (cb) {
+                cb(new Error('Validation error'));
+            }
+        } else {
+            update.call(this);
         }
-        cb(err);
     }.bind(this));
+
+    function update() {
+        this.trigger('save', function (saveDone) {
+            this.trigger('update', function (done) {
+
+                Object.keys(data).forEach(function (key) {
+                    data[key] = this[key];
+                }.bind(this));
+
+                this._adapter().updateAttributes(model, this.id, data, function (err) {
+                    if (!err) {
+                        Object.keys(data).forEach(function (key) {
+                            inst[key] = data[key];
+                            Object.defineProperty(inst, key + '_was', {
+                                writable:     false,
+                                configurable: true,
+                                enumerable:   false,
+                                value:        data[key]
+                            });
+                        });
+                    }
+                    done.call(inst, function () {
+                        saveDone.call(inst, function () {
+                            cb(err);
+                        });
+                    });
+                }.bind(this));
+            });
+        });
+    }
 };
 
 /**
@@ -1037,6 +1098,9 @@ Validatable.validatesNumericalityOf = getConfigurator('numericality');
 Validatable.validatesInclusionOf = getConfigurator('inclusion');
 Validatable.validatesExclusionOf = getConfigurator('exclusion');
 Validatable.validatesFormatOf = getConfigurator('format');
+Validatable.validate = getConfigurator('custom');
+Validatable.validateAsync = getConfigurator('custom', {async: true});
+Validatable.validatesUniquenessOf = getConfigurator('uniqueness', {async: true});
 
 // implementation of validators
 var validators = {
@@ -1093,22 +1157,40 @@ var validators = {
         } else {
             err();
         }
+    },
+    custom: function (attr, conf, err, done) {
+        conf.customValidator.call(this, err, done);
+    },
+    uniqueness: function (attr, conf, err, done) {
+        var cond = {where: {}};
+        cond.where[attr] = this[attr];
+        this.constructor.all(cond, function (error, found) {
+            if (found.length > 1) {
+                err();
+            } else if (found.length === 1 && found[0].id !== this.id) {
+                err();
+            }
+            done();
+        }.bind(this));
     }
 };
 
 
-function getConfigurator(name) {
+function getConfigurator(name, opts) {
     return function () {
-        configure(this, name, arguments);
+        configure(this, name, arguments, opts);
     };
 }
 
-Validatable.prototype.isValid = function () {
-    var valid = true, inst = this;
+Validatable.prototype.isValid = function (callback) {
+    var valid = true, inst = this, wait = 0, async = false;
 
     // exit with success when no errors
     if (!this.constructor._validations) {
         cleanErrors(this);
+        if (callback) {
+            callback(valid);
+        }
         return valid;
     }
 
@@ -1118,12 +1200,37 @@ Validatable.prototype.isValid = function () {
         value: new Errors
     });
 
-    this.constructor._validations.forEach(function (v) {
-        if (validationFailed(inst, v)) {
-            valid = false;
+    this.trigger('validation', function (validationsDone) {
+        var inst = this;
+        this.constructor._validations.forEach(function (v) {
+            if (v[2] && v[2].async) {
+                valid = false;
+                async = true;
+                wait += 1;
+                validationFailed(inst, v, done);
+            } else {
+                if (validationFailed(inst, v)) {
+                    valid = false;
+                }
+            }
+
+        });
+
+        var asyncFail = false;
+        function done(fail) {
+            asyncFail = asyncFail || fail;
+            if (--wait === 0 && callback) {
+                validationsDone.call(inst, function () {
+                    callback(!asyncFail);
+                });
+            }
         }
+
     });
+
     if (valid) cleanErrors(this);
+    if (!async && callback) callback(valid);
+
     return valid;
 };
 
@@ -1135,9 +1242,12 @@ function cleanErrors(inst) {
     });
 }
 
-function validationFailed(inst, v) {
+function validationFailed(inst, v, cb) {
     var attr = v[0];
     var conf = v[1];
+    var opts = v[2] || {};
+
+    if (typeof attr !== 'string') return false;
 
     // here we should check skip validation conditions (if, unless)
     // that can be specified in conf
@@ -1145,7 +1255,11 @@ function validationFailed(inst, v) {
     if (skipValidation(inst, conf, 'unless')) return false;
 
     var fail = false;
-    validators[conf.validation].call(inst, attr, conf, function onerror(kind) {
+    var validator = validators[conf.validation];
+    var validatorArguments = [];
+    validatorArguments.push(attr);
+    validatorArguments.push(conf);
+    validatorArguments.push(function onerror(kind) {
         var message;
         if (conf.message) {
             message = conf.message;
@@ -1167,6 +1281,12 @@ function validationFailed(inst, v) {
         inst.errors.add(attr, message);
         fail = true;
     });
+    if (cb) {
+        validatorArguments.push(function () {
+            cb(fail);
+        });
+    }
+    validator.apply(inst, validatorArguments);
     return fail;
 }
 
@@ -1205,7 +1325,8 @@ var defaultMessages = {
         'number': 'is not a number'
     },
     inclusion: 'is not included in the list',
-    exclusion: 'is reserved'
+    exclusion: 'is reserved',
+    uniqueness: 'is not unique'
 };
 
 function nullCheck(attr, conf, err) {
@@ -1234,7 +1355,7 @@ function blank(v) {
     return false;
 }
 
-function configure(cls, validation, args) {
+function configure(cls, validation, args, opts) {
     if (!cls._validations) {
         Object.defineProperty(cls, '_validations', {
             writable: true,
@@ -1250,9 +1371,12 @@ function configure(cls, validation, args) {
     } else {
         conf = {};
     }
+    if (validation === 'custom' && typeof args[args.length - 1] === 'function') {
+        conf.customValidator = args.pop();
+    }
     conf.validation = validation;
     args.forEach(function (attr) {
-        cls._validations.push([attr, conf]);
+        cls._validations.push([attr, conf, opts]);
     });
 }
 
@@ -1266,6 +1390,59 @@ Errors.prototype.add = function (field, message) {
         this[field].push(message);
     }
 };
+
+
+});
+
+require.define("/node_modules/jugglingdb/lib/hookable.js", function (require, module, exports, __dirname, __filename) {
+    exports.Hookable = Hookable;
+
+function Hookable() {
+    // hookable class
+};
+
+Hookable.afterInitialize = null;
+Hookable.beforeValidation = null;
+Hookable.afterValidation = null;
+Hookable.beforeSave = null;
+Hookable.afterSave = null;
+Hookable.beforeCreate = null;
+Hookable.afterCreate = null;
+Hookable.beforeUpdate = null;
+Hookable.afterUpdate = null;
+Hookable.beforeDestroy = null;
+Hookable.afterDestroy = null;
+
+Hookable.prototype.trigger = function trigger(actionName, work) {
+    var capitalizedName = capitalize(actionName);
+    var afterHook = this.constructor["after" + capitalizedName];
+    var beforeHook = this.constructor["before" + capitalizedName];
+    var inst = this;
+
+    // we only call "before" hook when we have actual action (work) to perform
+    if (work) {
+        if (beforeHook) {
+            // before hook should be called on instance with one param: callback
+            beforeHook.call(inst, function () {
+                // actual action also have one param: callback
+                work.call(inst, next);
+            });
+        } else {
+            work.call(inst, next);
+        }
+    } else {
+        next();
+    }
+
+    function next(done) {
+        if (afterHook) afterHook.call(inst, done);
+        else if (done) done.call(this);
+    }
+};
+
+function capitalize(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 });
 

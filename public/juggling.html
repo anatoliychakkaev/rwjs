@@ -41,11 +41,10 @@
 
     <script type="text/jugglingdb">
       Post.validatesPresenceOf('title');
-      post = new Post();
+      var post = new Post();
       post.isValid();
       post.title = 'Title';
       post.isValid();
-      Post.all(c);
       post.save(c);
       Post.all(c);
     </script>
@@ -91,11 +90,13 @@
           published: { type: Boolean, default: false }
       });
 
+      User.hasMany(Post, {as: 'posts', foreignKey: 'authorId'});
+
       AbstractClass.prototype.toString = function () {
         return '[' + this.constructor.modelName + ' ' + this.id + ']';
       };
       console.log = function () {
-        $('#example form').before('<div><strong class="jugg">jugglingdb></strong> ' + [].join.call(arguments, ' ') + '</div>');
+        $('#example form').before('<div class="log"><strong class="jugg">jugglingdb></strong> ' + [].join.call(arguments, ' ') + '</div>');
       };
       console.result = function (res) {
         $('#example form').before('<div class="result"> ' + res + '</div>');
@@ -103,7 +104,7 @@
       console.eval = function (s) {
         console.log(s);
         try {
-          console.result(eval(s));
+          console.result(eval.call(null, s));
         } catch(e) {
           console.result(e);
         }
@@ -114,7 +115,8 @@
 
         $('#example form').submit(function () {
           console.eval(this.console.value);
-          this.console.select();
+          this.console.value = '';
+          this.console.focus();
           return false;
         });
 
@@ -184,7 +186,10 @@ Post = schema.define('Post', {
     content:   { type: Text },
     date:      { type: Date,    default: Date.now },
     published: { type: Boolean, default: false }
-});</pre>
+});
+
+User.hasMany(Post, {as: 'posts', foreignKey: 'authorId'});
+</pre>
   </div></div>
 
   <div class="page-header"><h1>Your turn</h1></div>
