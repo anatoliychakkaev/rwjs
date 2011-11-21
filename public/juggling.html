@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Try JugglingDB</title>
+    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
+    <link href="/javascripts/prettyprint/prettify.css" rel="stylesheet">
+
+    <meta name="description" content="JugglingDB - cross-database ORM ActiveRecord-like" >
+    <meta name="keywords" content="nodejs, activerecord, orm, mysql, redis, neo4j, javascript, async" >
+
+    <script type="text/javascript" src="/schema.js"></script>
+    <script type="text/javascript" src="/javascripts/jquery.min.js"></script>
+    <script type="text/javascript" src="/javascripts/prettyprint/prettify.js"></script>
+
+    <style>
+      section {
+        padding-top: 60px;
+      }
+      .example, .example form .console {
+        font-family: monospace;
+      }
+      .example form .console {
+        border: 0;
+        box-shadow: none;
+        -webkit-box-shadow: none;
+        -moz-box-shadow: none;
+        margin: 0;
+        padding: 0;
+      }
+      strong.array {
+        color: #479;
+      }
+      span.keyword {
+        color: #479;
+        font-weight: 700;
+      }
+      strong.jugg {
+        color: lightgray;
+      }
+    </style>
+
+    <script type="text/jugglingdb">
+      Post.validatesPresenceOf('title');
+      post = new Post();
+      post.isValid();
+      post.title = 'Title';
+      post.isValid();
+      Post.all(c);
+      post.save(c);
+      Post.all(c);
+    </script>
+
+    <script>
+      if (!window.console) {
+        window.console = {};
+      }
+      var undef;
+      function stringify(v) {
+        if (v === null) return '<span class="keyword">null</span>';
+        if (typeof v === 'undefined') return '<span class="keyword">undefined</span>';
+        if (v.constructor === Array) {
+          return '<strong class="array">[</strong>' + v.join(', ') + '<strong class="array">]</strong>';
+        }
+        return v;
+      }
+
+      var c = function () {
+        var args = '';
+        [].forEach.call(arguments, function (arg, index) {
+          var name = '_' + index;
+          args += name + ' = ' + stringify(arg) + '<br/>';
+          window[name] = arg;
+        });
+        console.result('Callback called with ' + arguments.length +
+        ' arguments<br/>' +
+        args);
+      };
+
+      User = schema.define('User', {
+          name:         String,
+          bio:          Text,
+          approved:     Boolean,
+          joinedAt:     Date,
+          age:          Number
+      });
+
+      Post = schema.define('Post', {
+          title:     { type: String, length: 255, index: true },
+          content:   { type: Text },
+          date:      { type: Date,    default: Date.now },
+          published: { type: Boolean, default: false }
+      });
+
+      AbstractClass.prototype.toString = function () {
+        return '[' + this.constructor.modelName + ' ' + this.id + ']';
+      };
+      console.log = function () {
+        $('#example form').before('<div><strong class="jugg">jugglingdb></strong> ' + [].join.call(arguments, ' ') + '</div>');
+      };
+      console.result = function (res) {
+        $('#example form').before('<div class="result"> ' + res + '</div>');
+      };
+      console.eval = function (s) {
+        console.log(s);
+        try {
+          console.result(eval(s));
+        } catch(e) {
+          console.result(e);
+        }
+      };
+      $(function () {
+
+        $('#example form input')[0].focus();
+
+        $('#example form').submit(function () {
+          console.eval(this.console.value);
+          this.console.select();
+          return false;
+        });
+
+        $('script[type="text/jugglingdb"]').each(function () {
+          var cmds = [];
+          $(this).text().split(/\n/).forEach(function (s) {
+            if (s.replace(/^\s+|\s+$/g, '')) cmds.push(s);
+          });
+          run();
+
+          function run() {
+            var cmd = cmds.shift();
+            if (cmd) {
+              console.eval(cmd);
+              setTimeout(run, 100);
+            }
+          };
+        });
+
+        prettyPrint();
+      });
+    </script>
+
+  </head>
+  <body style="padding-top: 60px">
+    <a href="http://github.com/1602/jugglingdb"><img style="position: fixed; top: 0; right: 0; border: 0;z-index: 10001;" src="https://d3nwyuy0nl342s.cloudfront.net/img/e6bef7a091f5f3138b8cd40bc3e114258dd68ddf/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub"></a>
+    <div class="topbar-wrapper" style="z-index: 5;">
+      <div class="topbar" data-scrollspy="scrollspy">
+        <div class="topbar-inner">
+          <div class="container">
+            <h3><a href="#">JugglingDB</a></h3>
+            <ul class="nav">
+              <!-- HEADER -->
+              <li><a href="#tip">Tip</a></li>
+              <!--li class="dropdown">
+                <a href="#" class="dropdown-toggle">Features</a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">Extensions</a></li>
+                  <li><a href="#">Coffee</a></li>
+                  <li class="divider"></li>
+                  <li><a href="#">Contributing</a></li>
+                </ul>
+              </li-->
+            </ul>
+          </div>
+        </div><!-- /topbar-inner -->
+      </div><!-- /topbar -->
+    </div><!-- /topbar-wrapper -->
+
+<div class="container" id="container">
+  <div class="page-header"><h1>Background</h1></div>
+
+  <div class="row">
+
+  <div class="span-two-thirds">
+
+  <pre class="prettyprint">User = schema.define('User', {
+    name:         String,
+    bio:          Text,
+    approved:     Boolean,
+    joinedAt:     Date,
+    age:          Number
+});
+
+Post = schema.define('Post', {
+    title:     { type: String, length: 255, index: true },
+    content:   { type: Text },
+    date:      { type: Date,    default: Date.now },
+    published: { type: Boolean, default: false }
+});</pre>
+  </div></div>
+
+  <div class="page-header"><h1>Your turn</h1></div>
+
+  <div class="example" id="example">
+    <form><strong class="jugg">jugglingdb></strong>
+      <input name="console" class="console" autocomplete="off">
+    </form>
+  </div>
+</div>
+
+<footer class="footer">
+<div class="container">
+  <p class="pull-right"><a href="#">Back to top</a></p>
+  <p>
+    Documentation written by <a href="http://twitter.com/1602">@1602 (Anatoliy Chakkaev)</a>.<br/>
+    Built on <a href="http://twitter.github.com/bootstrap">Bootstrap</a> from Twitter<br/>
+    RailwayJS code licensed under the <a href="http://www.opensource.org/licenses/mit-license.php" target="_blank">MIT License</a>. Documentation licensed under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.
+  </p>
+  <h6 style="text-align: center" id="tip">
+    RailwayJS and JugglingDB projects are free, but you can leave a tip here:
+  </h6>
+  <form style="text-align: center" action="https://www.paypal.com/cgi-bin/webscr" method="post">
+    <input type="hidden" name="cmd" value="_s-xclick">
+    <input type="hidden" name="hosted_button_id" value="J3JJDYJW78LEJ">
+    <input type="image" style="box-shadow: none; -webkit-box-shadow: none; padding: 0; border: 0; width: 147px; height: 47px;" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+    <img alt="" border="0" src="https://www.paypalobjects.com/ru_RU/i/scr/pixel.gif" width="1" height="1">
+  </form>
+</div>
+</footer>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-23280347-1']);
+  _gaq.push(['_setDomainName', 'none']);
+  _gaq.push(['_setAllowLinker', true]);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+   })();
+
+</script>
+
+</html>
