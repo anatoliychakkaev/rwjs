@@ -10,6 +10,7 @@
 
     <script type="text/javascript" src="/schema.js"></script>
     <script type="text/javascript" src="/javascripts/jquery.min.js"></script>
+    <script type="text/javascript" src="/javascripts/showdown.js"></script>
     <script type="text/javascript" src="/javascripts/prettyprint/prettify.js"></script>
     <script type="text/javascript" src="/javascripts/bootstrap-dropdown.js"></script>
 
@@ -123,11 +124,11 @@
           if (index == undefined) index = count;
 
           if (event.keyCode == 38) {
-          index--; // up
+            index--; // up
           } else if (event.keyCode == 40) {
-          index++; // down
+            index++; // down
           } else {
-          return;
+            return;
           }
 
           // Out of range at the positive side of the range makes sure
@@ -156,6 +157,8 @@
 
         if (location.hash) {
           demonstrate(location.hash.replace('#', ''));
+        } else {
+          demonstrate('blank');
         }
 
         prettyPrint();
@@ -212,6 +215,12 @@
                   <li><a href="#validatesUniquenessOf" rel="demo">uniqueness</a></li>
                 </ul>
               </li>
+              <li class="dropdown" data-dropdown="dropdown">
+                <a href="#" class="dropdown-toggle">Hooks</a>
+                <ul class="dropdown-menu">
+                  <li><a href="#hookInitialize" rel="demo">initialize</a></li>
+                </ul>
+              </li>
               <li><a href="#tip">Tip</a></li>
             </ul>
           </div>
@@ -224,7 +233,8 @@
 
   <div class="row">
 
-  <div class="span-one-half">
+  <div class="span-one-half" id="doc" style="width: 450px;">
+    Choose one of examples from the top bar's dropdowns (Common, Validations, Hooks, etc..), or just write your code after the <strong class="jugg">"jugglingdb>"</strong> prompt.
 
   <pre class="prettyprint">User = schema.define('User', {
     name:         String,
@@ -239,15 +249,12 @@ Post = schema.define('Post', {
     content:   { type: Text },
     date:      { type: Date,    default: Date.now },
     published: { type: Boolean, default: false }
-});
-
-User.hasMany(Post,
-    {as: 'posts', foreignKey: 'authorId'});</pre>
+});</pre>
 
   </div>
-  <div class="span-one-half">
+  <div class="span-one-half" style="width: 450px;">
 
-    <div class="example" id="example" style="overflow: auto; width: 519px;">
+    <div class="example" id="example" style="overflow: auto; width: 450px;">
       <form><strong class="jugg">jugglingdb></strong>
         <input name="console" class="console" autocomplete="off">
       </form>
@@ -292,7 +299,6 @@ User.hasMany(Post,
 
 </script>
 
-
 <script type="text/jugglingdb" name="init">
   User = schema.define('User', {
       name:         String,
@@ -313,6 +319,9 @@ User.hasMany(Post,
   });
 
   User.hasMany(Post, {as: 'posts', foreignKey: 'authorId'});
+</script>
+
+<script type="text/jugglingdb" name="blank">
 </script>
 
 <script type="text/jugglingdb" name="validatesPresenceOf">
