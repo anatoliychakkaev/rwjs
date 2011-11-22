@@ -67,11 +67,11 @@ function bootstrapize(code) {
     return code.replace(/<!--! (.*?) -->/g, function (m, x) {
         x = x.split('.');
         var block = x[0];
-        var class = x[1];
+        var cls = x[1];
         if (block === 'row') return '<div class="row">';
         if (block.match(/^end/)) return '</div>';
-        if (block === 'col') return '<div class="' + class + '">';
-        return '<' + block + (class ? ' class="' + class + '"' : '') + '>';
+        if (block === 'col') return '<div class="' + cls + '">';
+        return '<' + block + (cls ? ' class="' + cls + '"' : '') + '>';
     });
 }
 

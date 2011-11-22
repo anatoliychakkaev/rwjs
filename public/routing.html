@@ -46,7 +46,12 @@
     </div><!-- /topbar-wrapper -->
 
 <div class="container">
-  <h1 style="text-align: center; font-size: 250%; position: relative; top: 30px;"><span style="color: #a24;">RailwayJS - MVC framework</span><br/><small>Create NodeJS web apps faster with more energy, using RailwayJS</small><small><br/><strong style="color:#a24">BREAKING NEWS:</strong> JugglingDB coming soon, checkout <a href="https://github.com/1602/express-on-railway/tree/develop">develop</a> branch, read <a href="#orm">docs</a></small></h1>
+  <h1 style="text-align: center; font-size: 250%; position: relative; top: 30px;"><span style="color: #a24;">RailwayJS - MVC framework</span>
+    <br/>
+    <small>
+      Create NodeJS web apps faster with more energy, using RailwayJS
+    </small><br/>
+    <small><strong style="color:#a24">Juggling already:</strong> <a href="/juggling.html">try in you browser</a></small></h1>
 
   <section><div class="page-header">
 
@@ -201,7 +206,7 @@ path_to.post(post)          # /posts/1
 
 <p>This routing map will provide the following routes:</p>
 
-<pre class="prettyprint">$ rw r
+<pre class="prettyprint">$ railway routes
      post_comments GET      /posts/:post_id/comments          comments#index
      post_comments POST     /posts/:post_id/comments          comments#create
   new_post_comment GET      /posts/:post_id/comments/new      comments#new

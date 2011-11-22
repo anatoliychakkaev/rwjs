@@ -46,7 +46,12 @@
     </div><!-- /topbar-wrapper -->
 
 <div class="container">
-  <h1 style="text-align: center; font-size: 250%; position: relative; top: 30px;"><span style="color: #a24;">RailwayJS - MVC framework</span><br/><small>Create NodeJS web apps faster with more energy, using RailwayJS</small><small><br/><strong style="color:#a24">BREAKING NEWS:</strong> JugglingDB coming soon, checkout <a href="https://github.com/1602/express-on-railway/tree/develop">develop</a> branch, read <a href="#orm">docs</a></small></h1>
+  <h1 style="text-align: center; font-size: 250%; position: relative; top: 30px;"><span style="color: #a24;">RailwayJS - MVC framework</span>
+    <br/>
+    <small>
+      Create NodeJS web apps faster with more energy, using RailwayJS
+    </small><br/>
+    <small><strong style="color:#a24">Juggling already:</strong> <a href="/juggling.html">try in you browser</a></small></h1>
 
   <section><div class="page-header">
 
@@ -65,12 +70,12 @@ Railway generators - are automated tools allows you to create bunch of files aut
 
 <p>Each generator can be invoked by command</p>
 
-<pre class="prettyprint">rw generate GENERATOR_NAME
+<pre class="prettyprint">railway generate GENERATOR_NAME
 </pre>
 
 <p>or, using shortcut</p>
 
-<pre class="prettyprint">rw g GENERATOR_NAME
+<pre class="prettyprint">railway g GENERATOR_NAME
 </pre>
 
 Built-in generators: model, controller, scaffold (crud)
@@ -92,7 +97,7 @@ Built-in generators: model, controller, scaffold (crud)
 
 <p>Example call:</p>
 
-<pre class="prettyprint">rw g controller controllername actionName anotherActionName
+<pre class="prettyprint">railway g controller controllername actionName anotherActionName
 </pre>
 
 <p>Generate files:</p>
@@ -186,7 +191,7 @@ module.exports["User"] = mongoose.model("User");
 
 <p>Example call:</p>
 
-<pre class="prettyprint">rw g scaffold post title content createdAt:date
+<pre class="prettyprint">railway g scaffold post title content createdAt:date
 exists  app/
 exists  app/models/
 create  app/models/post.js

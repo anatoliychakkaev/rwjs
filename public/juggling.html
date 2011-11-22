@@ -11,6 +11,7 @@
     <script type="text/javascript" src="/schema.js"></script>
     <script type="text/javascript" src="/javascripts/jquery.min.js"></script>
     <script type="text/javascript" src="/javascripts/prettyprint/prettify.js"></script>
+    <script type="text/javascript" src="/javascripts/bootstrap-dropdown.js"></script>
 
     <style>
       section {
@@ -26,6 +27,7 @@
         -moz-box-shadow: none;
         margin: 0;
         padding: 0;
+        font-weight: 700;
       }
       strong.array {
         color: #479;
@@ -34,20 +36,19 @@
         color: #479;
         font-weight: 700;
       }
+      span.error {
+        color: #944;
+      }
+      span.string {
+        color: red;
+      }
+      div.log {
+        font-weight: 700;
+      }
       strong.jugg {
         color: lightgray;
       }
     </style>
-
-    <script type="text/jugglingdb">
-      Post.validatesPresenceOf('title');
-      var post = new Post();
-      post.isValid();
-      post.title = 'Title';
-      post.isValid();
-      post.save(c);
-      Post.all(c);
-    </script>
 
     <script>
       if (!window.console) {
@@ -72,36 +73,33 @@
         });
         console.result('Callback called with ' + arguments.length +
         ' arguments<br/>' +
-        args);
+        args, true);
       };
-
-      User = schema.define('User', {
-          name:         String,
-          bio:          Text,
-          approved:     Boolean,
-          joinedAt:     Date,
-          age:          Number
-      });
-
-      Post = schema.define('Post', {
-          title:     { type: String, length: 255, index: true },
-          content:   { type: Text },
-          date:      { type: Date,    default: Date.now },
-          published: { type: Boolean, default: false }
-      });
-
-      User.hasMany(Post, {as: 'posts', foreignKey: 'authorId'});
 
       AbstractClass.prototype.toString = function () {
-        return '[' + this.constructor.modelName + ' ' + this.id + ']';
+        return '' + this.constructor.modelName + '#' + (this.id || 'new') + '';
       };
       console.log = function () {
-        $('#example form').before('<div class="log"><strong class="jugg">jugglingdb></strong> ' + [].join.call(arguments, ' ') + '</div>');
+        $('#example form').before('<div class="log"><strong class="jugg">jugglingdb></strong> <span class="code">' + [].join.call(arguments, ' ') + '</span></div>');
       };
-      console.result = function (res) {
+      console.result = function (res, noformat) {
+        var cls = '';
+        if (!noformat) {
+          if (res instanceof Error) {
+            cls = 'error';
+            res = res.message;
+          } else if (typeof res === 'string') {
+            cls = 'string';
+            res = "'" + res + "'";
+          } else if (typeof res == 'undefined') {
+            return;
+          }
+          res = '<span class="' + cls + '">' + res + '</span>';
+        }
         $('#example form').before('<div class="result"> ' + res + '</div>');
       };
       console.eval = function (s) {
+        s = s.replace(/^\s+/, '');
         console.log(s);
         try {
           console.result(eval.call(null, s));
@@ -109,35 +107,86 @@
           console.result(e);
         }
       };
+
       $(function () {
+        $example = $('#example');
 
-        $('#example form input')[0].focus();
+        $('a[rel="demo"]').click(function () {
+          demonstrate($(this).attr('href').replace('#', ''));
+        });
 
-        $('#example form').submit(function () {
-          console.eval(this.console.value);
-          this.console.value = '';
-          this.console.focus();
+        var $input = $('#example form input');
+        $input[0].focus();
+        $input.keydown(function(event) {
+          var count = $example.find(".log").size();
+          var index = $input.data("index");
+          if (index == undefined) index = count;
+
+          if (event.keyCode == 38) {
+          index--; // up
+          } else if (event.keyCode == 40) {
+          index++; // down
+          } else {
+          return;
+          }
+
+          // Out of range at the positive side of the range makes sure
+          // we can get back to an empty value.
+          if (index >= 0 && index <= count) {
+            $input.data("index", index);
+            $input.val($example.find(".log").eq(index).find('.code').text());
+            $input.setSelection($input.val().length);
+          }
+
           return false;
         });
 
-        $('script[type="text/jugglingdb"]').each(function () {
-          var cmds = [];
-          $(this).text().split(/\n/).forEach(function (s) {
-            if (s.replace(/^\s+|\s+$/g, '')) cmds.push(s);
-          });
-          run();
-
-          function run() {
-            var cmd = cmds.shift();
-            if (cmd) {
-              console.eval(cmd);
-              setTimeout(run, 100);
-            }
-          };
+        $('#example form').submit(function () {
+          console.eval($input.val());
+          $input.val('');
+          $input[0].focus();
+          $input.data("index", null);
+          return false;
         });
 
+        window.scripts = {};
+        $('script[type="text/jugglingdb"]').each(function () {
+          scripts[$(this).attr('name')] = $(this).text();
+        });
+
+        if (location.hash) {
+          demonstrate(location.hash.replace('#', ''));
+        }
+
         prettyPrint();
+
       });
+
+      function demonstrate(name) {
+        $('#example div').remove();
+        if (scripts[name]) {
+          runScript(scripts[name]);
+        } else {
+        }
+      }
+
+      function runScript(text) {
+        eval.call(null, scripts.init);
+
+        var cmds = [];
+        text.split(/\n/).forEach(function (s) {
+          if (s.replace(/^\s+|\s+$/g, '')) cmds.push(s);
+        });
+        run();
+
+        function run() {
+          var cmd = cmds.shift();
+          if (cmd) {
+            console.eval(cmd);
+            setTimeout(run, 100);
+          }
+        };
+      }
     </script>
 
   </head>
@@ -149,17 +198,21 @@
           <div class="container">
             <h3><a href="#">JugglingDB</a></h3>
             <ul class="nav">
-              <!-- HEADER -->
-              <li><a href="#tip">Tip</a></li>
-              <!--li class="dropdown">
-                <a href="#" class="dropdown-toggle">Features</a>
+              <li class="dropdown" data-dropdown="dropdown">
+                <a href="#" class="dropdown-toggle">Validations</a>
                 <ul class="dropdown-menu">
-                  <li><a href="#">Extensions</a></li>
-                  <li><a href="#">Coffee</a></li>
-                  <li class="divider"></li>
-                  <li><a href="#">Contributing</a></li>
+                  <li><a href="#validatesPresenceOf" rel="demo">presence</a></li>
+                  <li><a href="#validatesLengthOf" rel="demo">length</a></li>
+                  <li><a href="#validatesFormatOf" rel="demo">format</a></li>
+                  <li><a href="#validatesNumericalityOf" rel="demo">numericality</a></li>
+                  <li><a href="#validatesInclusionOf" rel="demo">inclusion</a></li>
+                  <li><a href="#validatesExclusionOf" rel="demo">exclusion</a></li>
+                  <li><a href="#validateCustom" rel="demo">custom</a></li>
+                  <li><a href="#validateCustomAsync" rel="demo">custom async</a></li>
+                  <li><a href="#validatesUniquenessOf" rel="demo">uniqueness</a></li>
                 </ul>
-              </li-->
+              </li>
+              <li><a href="#tip">Tip</a></li>
             </ul>
           </div>
         </div><!-- /topbar-inner -->
@@ -167,11 +220,11 @@
     </div><!-- /topbar-wrapper -->
 
 <div class="container" id="container">
-  <div class="page-header"><h1>Background</h1></div>
+  <div class="page-header"><h1>Try JugglingDB</h1></div>
 
   <div class="row">
 
-  <div class="span-two-thirds">
+  <div class="span-one-half">
 
   <pre class="prettyprint">User = schema.define('User', {
     name:         String,
@@ -182,22 +235,24 @@
 });
 
 Post = schema.define('Post', {
-    title:     { type: String, length: 255, index: true },
+    title:     { type: String, length: 255 },
     content:   { type: Text },
     date:      { type: Date,    default: Date.now },
     published: { type: Boolean, default: false }
 });
 
-User.hasMany(Post, {as: 'posts', foreignKey: 'authorId'});
-</pre>
-  </div></div>
+User.hasMany(Post,
+    {as: 'posts', foreignKey: 'authorId'});</pre>
 
-  <div class="page-header"><h1>Your turn</h1></div>
+  </div>
+  <div class="span-one-half">
 
-  <div class="example" id="example">
-    <form><strong class="jugg">jugglingdb></strong>
-      <input name="console" class="console" autocomplete="off">
-    </form>
+    <div class="example" id="example" style="overflow: auto; width: 519px;">
+      <form><strong class="jugg">jugglingdb></strong>
+        <input name="console" class="console" autocomplete="off">
+      </form>
+    </div>
+
   </div>
 </div>
 
@@ -235,6 +290,112 @@ User.hasMany(Post, {as: 'posts', foreignKey: 'authorId'});
    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
    })();
 
+</script>
+
+
+<script type="text/jugglingdb" name="init">
+  User = schema.define('User', {
+      name:         String,
+      bio:          Text,
+      email:        String,
+      approved:     Boolean,
+      joinedAt:     Date,
+      age:          Number,
+      gender:       String,
+      domain:       String
+  });
+
+  Post = schema.define('Post', {
+      title:     { type: String },
+      content:   { type: String },
+      date:      { type: Date,    default: Date.now },
+      published: { type: Boolean, default: false }
+  });
+
+  User.hasMany(Post, {as: 'posts', foreignKey: 'authorId'});
+</script>
+
+<script type="text/jugglingdb" name="validatesPresenceOf">
+  Post.validatesPresenceOf('title');
+  var post = new Post();
+  post.isValid();
+  post.title = 'Title';
+  post.isValid();
+</script>
+
+<script type="text/jugglingdb" name="validatesLengthOf">
+  Post.validatesLengthOf('content', {max: 10, allowBlank: true});
+  var post = new Post();
+  post.isValid();
+  post.content = 'hey';
+  post.isValid();
+</script>
+
+<script type="text/jugglingdb" name="validatesFormatOf">
+  var checkEmail = /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/i;
+  User.validatesFormatOf('email', {with: checkEmail});
+  user = new User;
+  user.isValid();
+  user.email = 'anatoliy@example.com';
+  user.isValid();
+</script>
+
+<script type="text/jugglingdb" name="validatesInclusionOf">
+  User.validatesInclusionOf('gender', {in: ['male', 'female']});
+  var u = new User({gender: 'male'});
+  u.isValid();
+  u.gender = 'girl';
+  u.isValid();
+</script>
+
+<script type="text/jugglingdb" name="validatesExclusionOf">
+  User.validatesExclusionOf('domain', {in: ['www', 'admin']});
+  var u = new User;
+  u.isValid();
+  u.domain = 'www';
+  u.isValid();
+</script>
+
+<script type="text/jugglingdb" name="validateCustom">
+  var customValidator = function (err) { if (this.name === 'bad') err(); };
+  User.validate('name', customValidator, {message: 'Bad name'});
+  var user = new User({name: 'Peter'});
+  user.isValid();
+  user.name = 'bad';
+  user.isValid();
+</script>
+
+<script type="text/jugglingdb" name="validateCustomAsync">
+  var customValidatorAsync = function (err, done) { if (this.name === 'bad') err; setTimeout(done, 1000);};
+  user = new User;
+  user.isValid(c);
+  user.name = 'bad';
+  user.isValid(c);
+</script>
+
+<script type="text/jugglingdb" name="validatesUniquenessOf">
+  User.validatesUniquenessOf('email');
+  User.create({email: 'email@example.com'}, c);
+  var u = new User({email: 'email@example.com'});
+  u.isValid(c);
+  u.email = 'unique@email.com';
+  u.isValid(c);
+</script>
+
+<script type="text/jugglingdb" name="validatesNumericalityOf">
+  User.validatesNumericalityOf('age', {int: true});
+  var u = new User({age: 26.5});
+  u.isValid();
+  u.age = 26;
+  u.isValid();
+</script>
+
+<script type="text/jugglingdb" name="validatesNumericalityOf">
+  User.validatesNumericalityOf('age', {int: true});
+  var u = new User({age: 26.5});
+  u.isValid();
+  u.age = 26;
+  u.isValid();
 </script>
 
 </html>
