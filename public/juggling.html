@@ -274,10 +274,10 @@ Post = schema.define('Post', {
 
 <script type="text/jugglingdb" name="hasMany">
   User.hasMany(Post, {as: 'posts', foreignKey: 'authorId'});
-  var u = new User;
-  var p = u.posts.build();
+  User.create(c)
+  var p = _1.posts.build();
   p.save();
-  u.posts(c);
+  _1.posts(c);
 </script>
 
 </html>
