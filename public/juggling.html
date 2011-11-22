@@ -3,6 +3,7 @@
   <head>
     <title>Try JugglingDB</title>
     <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/playground.css">
     <link href="/javascripts/prettyprint/prettify.css" rel="stylesheet">
 
     <meta name="description" content="JugglingDB - cross-database ORM ActiveRecord-like" >
@@ -11,186 +12,12 @@
     <script type="text/javascript" src="/schema.js"></script>
     <script type="text/javascript" src="/javascripts/jquery.min.js"></script>
     <script type="text/javascript" src="/javascripts/showdown.js"></script>
+    <script type="text/javascript" src="/javascripts/playground.js"></script>
     <script type="text/javascript" src="/javascripts/prettyprint/prettify.js"></script>
     <script type="text/javascript" src="/javascripts/bootstrap-dropdown.js"></script>
 
     <style>
-      section {
-        padding-top: 60px;
-      }
-      .example, .example form .console {
-        font-family: monospace;
-      }
-      .example form .console {
-        border: 0;
-        box-shadow: none;
-        -webkit-box-shadow: none;
-        -moz-box-shadow: none;
-        margin: 0;
-        padding: 0;
-        font-weight: 700;
-      }
-      strong.array {
-        color: #479;
-      }
-      span.keyword {
-        color: #479;
-        font-weight: 700;
-      }
-      span.error {
-        color: #944;
-      }
-      span.string {
-        color: red;
-      }
-      div.log {
-        font-weight: 700;
-      }
-      strong.jugg {
-        color: lightgray;
-      }
     </style>
-
-    <script>
-      if (!window.console) {
-        window.console = {};
-      }
-      var undef;
-      function stringify(v) {
-        if (v === null) return '<span class="keyword">null</span>';
-        if (typeof v === 'undefined') return '<span class="keyword">undefined</span>';
-        if (v.constructor === Array) {
-          return '<strong class="array">[</strong>' + v.join(', ') + '<strong class="array">]</strong>';
-        }
-        return v;
-      }
-
-      var c = function () {
-        var args = '';
-        [].forEach.call(arguments, function (arg, index) {
-          var name = '_' + index;
-          args += name + ' = ' + stringify(arg) + '<br/>';
-          window[name] = arg;
-        });
-        console.result('Callback called with ' + arguments.length +
-        ' arguments<br/>' +
-        args, true);
-      };
-
-      AbstractClass.prototype.toString = function () {
-        return '' + this.constructor.modelName + '#' + (this.id || 'new') + '';
-      };
-      console.log = function () {
-        $('#example form').before('<div class="log"><strong class="jugg">jugglingdb></strong> <span class="code">' + [].join.call(arguments, ' ') + '</span></div>');
-      };
-      console.result = function (res, noformat) {
-        var cls = '';
-        if (!noformat) {
-          if (res instanceof Error) {
-            cls = 'error';
-            res = res.message;
-          } else if (typeof res === 'string') {
-            cls = 'string';
-            res = "'" + res + "'";
-          } else if (typeof res == 'undefined') {
-            return;
-          }
-          res = '<span class="' + cls + '">' + res + '</span>';
-        }
-        $('#example form').before('<div class="result"> ' + res + '</div>');
-      };
-      console.eval = function (s) {
-        s = s.replace(/^\s+/, '');
-        console.log(s);
-        try {
-          console.result(eval.call(null, s));
-        } catch(e) {
-          console.result(e);
-        }
-      };
-
-      $(function () {
-        $example = $('#example');
-
-        $('a[rel="demo"]').click(function () {
-          demonstrate($(this).attr('href').replace('#', ''));
-        });
-
-        var $input = $('#example form input');
-        $input[0].focus();
-        $input.keydown(function(event) {
-          var count = $example.find(".log").size();
-          var index = $input.data("index");
-          if (index == undefined) index = count;
-
-          if (event.keyCode == 38) {
-            index--; // up
-          } else if (event.keyCode == 40) {
-            index++; // down
-          } else {
-            return;
-          }
-
-          // Out of range at the positive side of the range makes sure
-          // we can get back to an empty value.
-          if (index >= 0 && index <= count) {
-            $input.data("index", index);
-            $input.val($example.find(".log").eq(index).find('.code').text());
-            $input.setSelection($input.val().length);
-          }
-
-          return false;
-        });
-
-        $('#example form').submit(function () {
-          console.eval($input.val());
-          $input.val('');
-          $input[0].focus();
-          $input.data("index", null);
-          return false;
-        });
-
-        window.scripts = {};
-        $('script[type="text/jugglingdb"]').each(function () {
-          scripts[$(this).attr('name')] = $(this).text();
-        });
-
-        if (location.hash) {
-          demonstrate(location.hash.replace('#', ''));
-        } else {
-          demonstrate('blank');
-        }
-
-        prettyPrint();
-
-      });
-
-      function demonstrate(name) {
-        $('#example div').remove();
-        if (scripts[name]) {
-          runScript(scripts[name]);
-        } else {
-        }
-      }
-
-      function runScript(text) {
-        eval.call(null, scripts.init);
-
-        var cmds = [];
-        text.split(/\n/).forEach(function (s) {
-          if (s.replace(/^\s+|\s+$/g, '')) cmds.push(s);
-        });
-        run();
-
-        function run() {
-          var cmd = cmds.shift();
-          if (cmd) {
-            console.eval(cmd);
-            setTimeout(run, 100);
-          }
-        };
-      }
-    </script>
 
   </head>
   <body style="padding-top: 60px">
@@ -201,6 +28,12 @@
           <div class="container">
             <h3><a href="#">JugglingDB</a></h3>
             <ul class="nav">
+              <li class="dropdown" data-dropdown="dropdown">
+                <a href="#" class="dropdown-toggle">Common</a>
+                <ul class="dropdown-menu">
+                  <li><a href="#hasMany" rel="demo">has many</a></li>
+                </ul>
+              </li>
               <li class="dropdown" data-dropdown="dropdown">
                 <a href="#" class="dropdown-toggle">Validations</a>
                 <ul class="dropdown-menu">
@@ -219,6 +52,8 @@
                 <a href="#" class="dropdown-toggle">Hooks</a>
                 <ul class="dropdown-menu">
                   <li><a href="#hookInitialize" rel="demo">initialize</a></li>
+                  <li><a href="#hookSave" rel="demo">save / create</a></li>
+                  <li><a href="#hookUpdate" rel="demo">save / update</a></li>
                 </ul>
               </li>
               <li><a href="#tip">Tip</a></li>
@@ -317,8 +152,6 @@ Post = schema.define('Post', {
       date:      { type: Date,    default: Date.now },
       published: { type: Boolean, default: false }
   });
-
-  User.hasMany(Post, {as: 'posts', foreignKey: 'authorId'});
 </script>
 
 <script type="text/jugglingdb" name="blank">
@@ -405,6 +238,46 @@ Post = schema.define('Post', {
   u.isValid();
   u.age = 26;
   u.isValid();
+</script>
+
+<script type="text/jugglingdb" name="hookInitialize">
+  Post.afterInitialize = spy('init', function () { this.title = this.title || this.id; });
+  new Post;
+  // create 3 posts
+  Post.create();
+  Post.create();
+  Post.create();
+  // posts
+  Post.all(c);
+  _1[2].title;
+</script>
+
+<script type="text/jugglingdb" name="hookCreate">
+  Post.beforeCreate = spy('before create');
+  Post.afterCreate = spy('after create');
+  Post.beforeSave = spy('before save');
+  Post.afterSave = spy('after save');
+  Post.create(c);
+  var s = new Post;
+  s.save(c);
+</script>
+
+<script type="text/jugglingdb" name="hookUpdate">
+  Post.beforeUpdate = spy('before update');
+  Post.beforeSave = spy('before save');
+  Post.afterUpdate = spy('after update');
+  Post.afterSave = spy('after save');
+  Post.create(c);
+  _1.title = 'Hello world';
+  _1.save(c);
+</script>
+
+<script type="text/jugglingdb" name="hasMany">
+  User.hasMany(Post, {as: 'posts', foreignKey: 'authorId'});
+  var u = new User;
+  var p = u.posts.build();
+  p.save();
+  u.posts(c);
 </script>
 
 </html>

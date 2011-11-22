@@ -1,0 +1,35 @@
+section {
+  padding-top: 60px;
+}
+.example, .example form .console {
+  font-family: monospace;
+}
+.example form .console {
+  border: 0;
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  margin: 0;
+  padding: 0;
+  font-weight: 700;
+  width: 350px;
+}
+strong.array {
+  color: #479;
+}
+span.keyword {
+  color: #479;
+  font-weight: 700;
+}
+span.error {
+  color: #944;
+}
+span.string {
+  color: red;
+}
+div.log {
+  font-weight: 700;
+}
+strong.jugg {
+  color: lightgray;
+}
