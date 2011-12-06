@@ -1,6 +1,14 @@
 if (!window.console) {
     window.console = {};
 }
+
+$.fn.markdown = function (md) {
+    var html = (new Showdown.converter).makeHtml(md);
+    return this.each(function () {
+        $(this).html(html);
+    });
+};
+
 var undef;
 function stringify(v) {
     if (v === null) return '<span class="keyword">null</span>';
@@ -115,6 +123,10 @@ $(function () {
     $('script[type="text/jugglingdb"]').each(function () {
         scripts[$(this).attr('name')] = $(this).text();
     });
+    window.docs = {};
+    $('script[type="text/markdown"]').each(function () {
+        docs[$(this).attr('name')] = $(this).text();
+    });
 
     if (location.hash) {
         demonstrate(location.hash.replace('#', ''));
@@ -132,6 +144,13 @@ function demonstrate(name) {
         runScript(scripts[name]);
     } else {
     }
+    if (docs[name]) {
+        displayDoc(docs[name]);
+    }
+}
+
+function displayDoc(md) {
+    $('#doc').markdown(md);
 }
 
 function runScript(text) {

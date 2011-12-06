@@ -251,7 +251,37 @@ Post = schema.define('Post', {
   _1[2].title;
 </script>
 
+<script type="text/markdown" name="hookCreate">
+## BaseModel.{before|after}Create hook
+This methods invoked on instance creation (when Model.create() method called)
+
+## Arguments
+- done - callback which should be invoked when hook done
+
+## Behavior
+**Note** that this hook is asyncronous, if `done` callback wouldn't be called
+then create flow will be interrupted.
+
+</script>
 <script type="text/jugglingdb" name="hookCreate">
+  Post.beforeCreate = spy('before create');
+  Post.afterCreate = spy('after create');
+  Post.create(c);
+</script>
+
+<script type="text/markdown" name="hookSave">
+## BaseModel.{before|after}Save hook
+This methods invoked on each save of instance (when instance.save() method called)
+
+## Arguments
+- done - callback which should be invoked when hook done
+
+## Behavior
+**Note** that this hook is asyncronous, if `done` callback wouldn't be called
+then save flow will be interrupted.
+</script>
+
+<script type="text/jugglingdb" name="hookSave">
   Post.beforeCreate = spy('before create');
   Post.afterCreate = spy('after create');
   Post.beforeSave = spy('before save');
@@ -259,6 +289,25 @@ Post = schema.define('Post', {
   Post.create(c);
   var s = new Post;
   s.save(c);
+</script>
+
+<script type="text/markdown" name="hookUpdate">
+## BaseModel.{before|after}Update hook
+This methods invoked on each update of instance
+
+## Arguments
+- done - callback which should be invoked when hook done
+
+## Behavior
+**Note** that this hook is asyncronous, if `done` callback wouldn't be called
+then update flow will be interrupted.
+
+This method called in context of instance, so, you can access instance's properties
+using `this`. But only changes on updated fields will be saved to database:
+when post.updateAttributes({'title': 'New title"}) called you can only
+modify `this.title`, inside update hook, all other changes wouldn't stored to the database
+
+Update hooks is the next in chain after the save hook.
 </script>
 
 <script type="text/jugglingdb" name="hookUpdate">
@@ -269,6 +318,22 @@ Post = schema.define('Post', {
   Post.create(c);
   _1.title = 'Hello world';
   _1.save(c);
+</script>
+
+<script type="text/markdown" name="hasMany">
+## BaseModel::hasMany
+
+This class method defines has many relation
+
+## Arguments
+- target class (Post in example)
+- options
+  * as - name of scope (when 'posts' then User.prototype.posts created)
+  * foreignKey - property name to store key in target model (Post.prototype.authorId)
+
+## Behavior
+- create named scope on this class
+- ensure `target class` has property pointed by `foreignKey`
 </script>
 
 <script type="text/jugglingdb" name="hasMany">
