@@ -75,6 +75,11 @@ UPSTART
     run "cd #{release_path}; git submodule init && git submodule update"
   end
 
+  desc "Install dependencies"
+  task :install_dependencies, :roles => :app do
+    run "cd #{release_path}; npm install -l"
+  end
+
   task :create_deploy_to_with_sudo, :roles => :app do
     run "sudo mkdir -p #{deploy_to}"
     run "sudo chown #{admin_runner}:#{admin_runner} #{deploy_to}"
@@ -84,4 +89,4 @@ end
 
 before 'deploy:setup', 'deploy:create_deploy_to_with_sudo'
 after 'deploy:setup', 'deploy:write_upstart_script'
-after "deploy:finalize_update", "deploy:cleanup", "deploy:update_submodules", "deploy:symlink_configs"#, "deploy:check_packages"
+after "deploy:finalize_update", "deploy:cleanup", "deploy:update_submodules", "deploy:symlink_configs", "deploy:install_dependencies"
