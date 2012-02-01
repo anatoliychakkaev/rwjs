@@ -13,6 +13,7 @@
   , "mime":             ">= 1.2.2"
   , "qs":               ">= 0.1.0"
   , "railway-monitor":  "*"
+  , "mongoose":         "*"
   }
 , "scripts":
   { "test": "nodeunit test/*/*"
