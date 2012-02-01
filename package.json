@@ -12,6 +12,7 @@
   , "coffee-script":    ">= 1.1.1"
   , "mime":             ">= 1.2.2"
   , "qs":               ">= 0.1.0"
+  , "railway-monitor":  "*"
   }
 , "scripts":
   { "test": "nodeunit test/*/*"
