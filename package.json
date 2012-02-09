@@ -12,7 +12,7 @@
   , "coffee-script":    ">= 1.1.1"
   , "mime":             ">= 1.2.2"
   , "qs":               ">= 0.1.0"
-  , "railway-monitor":  "*"
+  , "railway-monitor":  ">= 0.0.2"
   }
 , "repository":
   { "url": "git@github.com:anatoliychakkaev/rwjs.git"
