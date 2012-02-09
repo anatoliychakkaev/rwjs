@@ -1,4 +1,4 @@
-{ "name": "RWJS"
+{ "name": "railwayjs.com"
 , "version": "0.0.1"
 , "engines": ["node >= 0.4.0"]
 , "main": "server.js"
@@ -13,7 +13,9 @@
   , "mime":             ">= 1.2.2"
   , "qs":               ">= 0.1.0"
   , "railway-monitor":  "*"
-  , "mongoose":         "*"
+  }
+, "repository":
+  { "url": "git@github.com:anatoliychakkaev/rwjs.git"
   }
 , "scripts":
   { "test": "nodeunit test/*/*"
