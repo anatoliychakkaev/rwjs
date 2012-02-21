@@ -2,10 +2,12 @@
 <html>
   <head>
     <title>Try JugglingDB</title>
-    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
+    <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css">
+    <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css">
     <link rel="stylesheet" href="/stylesheets/playground.css">
     <link href="/javascripts/prettyprint/prettify.css" rel="stylesheet">
 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="JugglingDB - cross-database ORM ActiveRecord-like" >
     <meta name="keywords" content="nodejs, activerecord, orm, mysql, redis, neo4j, javascript, async" >
 
@@ -20,59 +22,76 @@
     </style>
 
   </head>
-  <body style="padding-top: 60px">
+  <body>
     <a href="http://github.com/1602/jugglingdb"><img style="position: fixed; top: 0; right: 0; border: 0;z-index: 10001;" src="https://d3nwyuy0nl342s.cloudfront.net/img/e6bef7a091f5f3138b8cd40bc3e114258dd68ddf/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub"></a>
-    <div class="topbar-wrapper" style="z-index: 5;">
-      <div class="topbar" data-scrollspy="scrollspy">
-        <div class="topbar-inner">
+    <div class="navbar-wrapper" style="z-index: 5;">
+      <div class="navbar" data-scrollspy="scrollspy">
+        <div class="navbar-inner">
           <div class="container">
-            <h3><a href="#">JugglingDB</a></h3>
-            <ul class="nav">
-              <li class="dropdown" data-dropdown="dropdown">
-                <a href="#" class="dropdown-toggle">Common</a>
-                <ul class="dropdown-menu">
-                  <li><a href="#create" rel="demo">create</a></li>
-                  <li><a href="#find" rel="demo">find</a></li>
-                  <li><a href="#all" rel="demo">all</a></li>
-                  <li><a href="#updateAttribute" rel="demo">updateAttribute</a></li>
-                  <li><a href="#updateAttributes" rel="demo">updateAttributes</a></li>
-                  <li><a href="#count" rel="demo">count</a></li>
-                  <li><a href="#destroy" rel="demo">destroy</a></li>
-                  <li><a href="#destroyAll" rel="demo">destroyAll</a></li>
-                  <li><a href="#hasMany" rel="demo">has many</a></li>
-                  <li><a href="#belongsTo" rel="demo">belongsTo</a></li>
-                </ul>
-              </li>
-              <li class="dropdown" data-dropdown="dropdown">
-                <a href="#" class="dropdown-toggle">Validations</a>
-                <ul class="dropdown-menu">
-                  <li><a href="#validatesPresenceOf" rel="demo">presence</a></li>
-                  <li><a href="#validatesLengthOf" rel="demo">length</a></li>
-                  <li><a href="#validatesFormatOf" rel="demo">format</a></li>
-                  <li><a href="#validatesNumericalityOf" rel="demo">numericality</a></li>
-                  <li><a href="#validatesInclusionOf" rel="demo">inclusion</a></li>
-                  <li><a href="#validatesExclusionOf" rel="demo">exclusion</a></li>
-                  <li><a href="#validateCustom" rel="demo">custom</a></li>
-                  <li><a href="#validateCustomAsync" rel="demo">custom async</a></li>
-                  <li><a href="#validatesUniquenessOf" rel="demo">uniqueness</a></li>
-                </ul>
-              </li>
-              <li class="dropdown" data-dropdown="dropdown">
-                <a href="#" class="dropdown-toggle">Hooks</a>
-                <ul class="dropdown-menu">
-                  <li><a href="#hookInitialize" rel="demo">initialize</a></li>
-                  <li><a href="#hookSave" rel="demo">save / create</a></li>
-                  <li><a href="#hookUpdate" rel="demo">save / update</a></li>
-                </ul>
-              </li>
-            </ul>
+            <a class="brand" href="#">JugglingDB</a></h3>
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </a>
+            <div class="nav-collapse">
+              <ul class="nav">
+                <li class="dropdown" data-dropdown="dropdown">
+                  <a href="#" class="dropdown-toggle">Base <b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li class="nav-header">Class methods</li>
+                    <li><a href="#create" rel="demo">create</a></li>
+                    <li><a href="#find" rel="demo">find</a></li>
+                    <li><a href="#all" rel="demo">all</a></li>
+                    <li><a href="#count" rel="demo">count</a></li>
+                    <li><a href="#destroyAll" rel="demo">destroyAll</a></li>
+                    <li><a href="#exists" rel="demo">exists</a></li>
+                    <li class="divider"></li>
+
+                    <li class="nav-header">Instance methods</li>
+                    <li><a href="#save" rel="demo">save</a></li>
+                    <li><a href="#reload" rel="demo">reload</a></li>
+                    <li><a href="#reset" rel="demo">reset</a></li>
+                    <li><a href="#updateAttribute" rel="demo">updateAttribute</a></li>
+                    <li><a href="#updateAttributes" rel="demo">updateAttributes</a></li>
+                    <li><a href="#destroy" rel="demo">destroy</a></li>
+                    <li class="divider"></li>
+
+                    <li class="nav-header">Model definitions</li>
+                    <li><a href="#hasMany" rel="demo">has many</a></li>
+                    <li><a href="#belongsTo" rel="demo">belongsTo</a></li>
+                  </ul>
+                </li>
+                <li class="dropdown" data-dropdown="dropdown">
+                  <a href="#" class="dropdown-toggle">Validations <b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li><a href="#validatesPresenceOf" rel="demo">presence</a></li>
+                    <li><a href="#validatesLengthOf" rel="demo">length</a></li>
+                    <li><a href="#validatesFormatOf" rel="demo">format</a></li>
+                    <li><a href="#validatesNumericalityOf" rel="demo">numericality</a></li>
+                    <li><a href="#validatesInclusionOf" rel="demo">inclusion</a></li>
+                    <li><a href="#validatesExclusionOf" rel="demo">exclusion</a></li>
+                    <li><a href="#validateCustom" rel="demo">custom</a></li>
+                    <li><a href="#validateCustomAsync" rel="demo">custom async</a></li>
+                    <li><a href="#validatesUniquenessOf" rel="demo">uniqueness</a></li>
+                  </ul>
+                </li>
+                <li class="dropdown" data-dropdown="dropdown">
+                  <a href="#" class="dropdown-toggle">Hooks <b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li><a href="#hookInitialize" rel="demo">initialize</a></li>
+                    <li><a href="#hookSave" rel="demo">save / create</a></li>
+                    <li><a href="#hookUpdate" rel="demo">save / update</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
           </div>
         </div><!-- /topbar-inner -->
       </div><!-- /topbar -->
     </div><!-- /topbar-wrapper -->
 
 <div class="container" id="container">
-  <div class="page-header"><h1>Try JugglingDB</h1></div>
 
   <div class="row">
 
@@ -377,6 +396,257 @@ Find instance of Model by given id
   post.content
   _1.content
   post.propertyChanged('content');
+</script>
+
+<script type="text/markdown" name="all">
+## Model.all
+
+Find all instances of Model
+
+## Arguments
+- conditions (optional)
+  * where: Object { key: val, key2: {gt: 'val2'}}
+  * order: String
+  * limit: Number
+  * skip: Number
+- callback (required) called with arguments:
+  * err (null or Error)
+  * Array of instances
+
+## Behavior
+Depends on adapter
+</script>
+
+<script type="text/jugglingdb" name="all">
+  Post.create({title: 'post 1', content: 'content'});
+  Post.create({title: 'post 2', content: 'content'});
+  Post.create({title: 'post 3', content: 'hey'});
+  Post.all({where: {content: 'content'}}, c);
+  _1
+  Post.all({where: {content: 'hey'}}, c);
+  _1
+  Post.all(c);
+</script>
+
+<script type="text/markdown" name="count">
+## Model.count
+
+Return count of all instances of Model
+
+## Arguments
+- conditions (optional) Object { key: val, key2: {gt: 'val2'}}
+- callback (required) called with arguments:
+  * err (null or Error)
+  * Number of instances
+
+## Behavior
+Depends on adapter
+</script>
+
+<script type="text/jugglingdb" name="count">
+  Post.create({title: 'post 1', content: 'content'});
+  Post.create({title: 'post 2', content: 'content'});
+  Post.create({title: 'post 3', content: 'hey'});
+  Post.count(c)
+  _1
+  Post.count({content: 'hey'}, c);
+  _1
+</script>
+
+<script type="text/markdown" name="destroyAll">
+## Model.destroyAll
+
+Destroy all instances of Model
+
+## Arguments
+- callback (required) called with arguments:
+  * err (null or Error)
+
+## Behavior
+Depends on adapter
+</script>
+
+<script type="text/jugglingdb" name="destroyAll">
+  Post.create({title: 'post 1', content: 'content'});
+  Post.create({title: 'post 2', content: 'content'});
+  Post.create({title: 'post 3', content: 'hey'});
+  Post.count(c)
+  Post.destroyAll(c);
+  Post.count(c)
+</script>
+
+<script type="text/markdown" name="exists">
+## Model.exists
+
+Check whether record with given id exists
+
+## Arguments
+- callback (required) called with arguments:
+  * err (null or Error)
+  * exists Boolean
+
+## Behavior
+Depends on adapter
+</script>
+
+<script type="text/jugglingdb" name="exists">
+  Post.create({title: 'post 1', content: 'content'});
+  Post.create({title: 'post 2', content: 'content'});
+  Post.create({title: 'post 3', content: 'hey'});
+  Post.exists(2, c);
+  Post.exists(5, c);
+</script>
+
+<script type="text/markdown" name="save">
+## Model.prototype.save
+
+Save changes made on instance
+
+## Arguments (all optional)
+- data
+- callback called with arguments:
+  * err (null or Error)
+  * object
+
+## Behavior
+Perform validations, hooks and save to database
+</script>
+
+<script type="text/jugglingdb" name="save">
+  Post.create({title: 'post', content: 'content'}, c);
+  post = _1
+  post.title = 'Post'
+  post.propertyChanged('title')
+  post.title_was
+  post.save(c)
+  post.propertyChanged('title')
+</script>
+
+<script type="text/markdown" name="reload">
+## Model.prototype.reload
+
+Reload instance state from database
+
+## Arguments (all optional)
+- callback called with arguments:
+  * err (null or Error)
+  * object
+
+## Behavior
+When some changes made on instance (dirty instance state), all of them will be lost
+We just clear cached object and load it from the persistence
+</script>
+
+<script type="text/jugglingdb" name="reload">
+  Post.create({title: 'post', content: 'content'}, c);
+  post = _1
+  post.title = 'Post'
+  post.propertyChanged('title')
+  post.title_was
+  post.reload(c)
+  post.propertyChanged('title')
+  post.title_was
+  post.title
+</script>
+
+<script type="text/markdown" name="reset">
+## Model.prototype.reset
+
+Reset all dirty properties to initial state
+
+## Arguments
+no arguments
+
+## Behavior
+When some changes made on instance (dirty instance state), all of them will be lost
+We just use _was value of each property to restore it
+</script>
+
+<script type="text/jugglingdb" name="reset">
+  Post.create({title: 'post', content: 'content'}, c);
+  post = _1
+  post.title = 'Post'
+  post.propertyChanged('title')
+  post.title_was
+  post.reset()
+  post.title
+  post.propertyChanged('title')
+  post.title_was
+</script>
+
+<script type="text/markdown" name="updateAttribute">
+## Model.prototype.updateAttribute
+
+Update single attribute
+
+## Arguments
+- name
+- value
+- callback called with arguments:
+  - error
+
+## Behavior
+Perform validation and update single property, all other properties remain untouched and not saved
+</script>
+
+<script type="text/jugglingdb" name="updateAttribute">
+  Post.create({title: 'post', content: 'content'}, c);
+  post = _1
+  post.title = 'Post'
+  post.updateAttribute('content', 'new content', c)
+  post.propertyChanged('title')
+  post.title_was
+  post.propertyChanged('content')
+  post.content
+  post.content_was
+</script>
+
+<script type="text/markdown" name="updateAttributes">
+## Model.prototype.updateAttributes
+
+Update set of attributes
+
+## Arguments
+- data
+- callback called with arguments:
+  - error
+
+## Behavior
+Perform validation and update set of properties, all other properties remain untouched and not saved
+</script>
+
+<script type="text/jugglingdb" name="updateAttributes">
+  Post.create({title: 'post', content: 'content'}, c);
+  post = _1
+  post.updateAttributes({ content: 'new content', title: 'title'}, c)
+  post.propertyChanged('title')
+  post.title
+  post.title_was
+  post.propertyChanged('content')
+  post.content
+  post.content_was
+</script>
+
+<script type="text/markdown" name="destroy">
+## Model.prototype.destroy
+
+Remove object from database
+
+## Arguments
+- callback called with arguments:
+  - error
+
+## Behavior
+Remove object and invoke callback when done
+
+</script>
+
+<script type="text/jugglingdb" name="destroy">
+  Post.create({title: 'post', content: 'content'}, c);
+  post = _1
+  Post.exists(post.id, c)
+  post.destroy(c)
+  Post.exists(post.id, c)
 </script>
 
 <script type="text/markdown" name="hasMany">
