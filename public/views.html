@@ -4,7 +4,6 @@
     <title>RailwayJS</title>
 
     <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css">
-    <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/javascripts/prettyprint/prettify.css" rel="stylesheet">
@@ -15,7 +14,6 @@
     <script type="text/javascript" src="/javascripts/jquery.min.js"></script>
     <script type="text/javascript" src="http://twitter.github.com/bootstrap/1.3.0/bootstrap-scrollspy.js"></script>
     <script type="text/javascript" src="/javascripts/bootstrap-dropdown.js"></script>
-    <script type="text/javascript" src="/javascripts/bootstrap-collapse.js"></script>
     <script>$(function () { prettyPrint() })</script>
 
     <style>
@@ -62,7 +60,7 @@
 
 <div class="row">
 
-<div class="span-one-third">
+<div class="span4">
 
 <h3>Templating engines</h3>
 
@@ -80,7 +78,7 @@
 
 </div>
 
-<div class="span-two-thirds">
+<div class="span8">
 
 <h3>View rendering flow</h3>
 
@@ -106,7 +104,7 @@
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <pre class="prettyprint">link_to('Users index', '/users');
 // &lt;a href="/users"&gt;Users index&lt;/a&gt;
@@ -161,7 +159,7 @@ link_to('Users index', '/users', {remote: true});
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <p>Accepts three params: resource, params and block. Block is function that receives as single param special object, which provide helpers with pre-filled values. Available helpers:</p>
 
@@ -213,7 +211,7 @@ link_to('Users index', '/users', {remote: true});
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <p>This is "light" version of <code>form_for</code> helper. It accepts just two arguments: params and block. Block didn't receives any params.
 Use this helper when you have no any resource, but still want to be able to use simple method overriding and csrf protection tokens.
@@ -233,7 +231,7 @@ Use this helper when you have no any resource, but still want to be able to use 
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <p>TODO: describe <code>input_tag</code></p>
 
@@ -251,7 +249,7 @@ Use this helper when you have no any resource, but still want to be able to use 
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <p>TODO: describe <code>label_tag</code></p>
 
@@ -269,7 +267,7 @@ Use this helper when you have no any resource, but still want to be able to use 
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <pre class="prettyprint">&lt;%- stylesheet_link_tag('reset', 'style', 'mobile') %&gt;
 </pre>
@@ -296,7 +294,7 @@ Use this helper when you have no any resource, but still want to be able to use 
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <pre class="prettyprint">&lt;%- javascript_include_tag(
   'https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js',

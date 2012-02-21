@@ -4,7 +4,6 @@
     <title>RailwayJS</title>
 
     <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css">
-    <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/javascripts/prettyprint/prettify.css" rel="stylesheet">
@@ -15,7 +14,6 @@
     <script type="text/javascript" src="/javascripts/jquery.min.js"></script>
     <script type="text/javascript" src="http://twitter.github.com/bootstrap/1.3.0/bootstrap-scrollspy.js"></script>
     <script type="text/javascript" src="/javascripts/bootstrap-dropdown.js"></script>
-    <script type="text/javascript" src="/javascripts/bootstrap-collapse.js"></script>
     <script>$(function () { prettyPrint() })</script>
 
     <style>
@@ -63,7 +61,7 @@
 
 <div class="row">
 
-<div class="span-one-third">
+<div class="span4">
 
 <h3>What is railway?</h3>
 
@@ -82,7 +80,7 @@
 
 </div>
 
-<div class="span-one-third">
+<div class="span4">
 
 <h3>1. Install</h3>
 
@@ -102,7 +100,7 @@ open http://127.0.0.1:8888/posts
 
 </div>
 
-<div class="span-one-third">
+<div class="span4">
 
 <h3>What is under the hood</h3>
 
@@ -146,7 +144,7 @@ open http://127.0.0.1:8888/posts
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <h3>Resource-based routing</h3>
 
@@ -194,7 +192,7 @@ path_to.post(post)          # /posts/1
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <h3>{ as: 'helperName' }</h3>
 
@@ -264,7 +262,7 @@ path_to.post(post)          # /posts/1
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <p>Let's describe route for nested resource</p>
 
@@ -315,7 +313,7 @@ path_to.edit_post_comment(2, 300)         # /posts/2/comments/300/edit
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <p>For example, let's create admin namespace:</p>
 
@@ -393,7 +391,7 @@ path_to.edit_post_comment(2, 300)         # /posts/2/comments/300/edit
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <h2>Features overview</h2>
 
@@ -433,7 +431,7 @@ path_to.edit_post_comment(2, 300)         # /posts/2/comments/300/edit
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <h3>render</h3>
 
@@ -546,7 +544,7 @@ redirect('http://example.com'); // redirect to another host
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <p>To chain methods you can use <code>before</code> and <code>after</code> methods:</p>
 
@@ -584,7 +582,7 @@ function loadProducts () {next()}
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <pre class="prettyprint">function loadProducts () {
     Product.find(function (err, prds) {
@@ -613,7 +611,7 @@ action('products', function () {
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <p>You can define <code>requireUser</code> in <code>application_controller.js</code> and call <code>publish</code>, and then you will be able to <code>use</code> it in your controller:</p>
 
@@ -646,7 +644,7 @@ before(use('userRequired'), {only: 'products'});
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <p>All other expressjs features have no global shortcuts yet, but they still can be used, because object <code>request</code> (or, shorter <code>req</code>) and <code>response</code> (alias <code>res</code>), are available as global variables in controller context. In view context only available long aliases: <code>response</code> and <code>request</code> to provide better coding style (it is bad to use this variables in views, but it's possible).</p>
 
@@ -662,7 +660,7 @@ before(use('userRequired'), {only: 'products'});
 
 <div class="row">
 
-<div class="span-one-third">
+<div class="span4">
 
 <h3>Templating engines</h3>
 
@@ -680,7 +678,7 @@ before(use('userRequired'), {only: 'products'});
 
 </div>
 
-<div class="span-two-thirds">
+<div class="span8">
 
 <h3>View rendering flow</h3>
 
@@ -706,7 +704,7 @@ before(use('userRequired'), {only: 'products'});
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <pre class="prettyprint">link_to('Users index', '/users');
 // &lt;a href="/users"&gt;Users index&lt;/a&gt;
@@ -761,7 +759,7 @@ link_to('Users index', '/users', {remote: true});
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <p>Accepts three params: resource, params and block. Block is function that receives as single param special object, which provide helpers with pre-filled values. Available helpers:</p>
 
@@ -813,7 +811,7 @@ link_to('Users index', '/users', {remote: true});
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <p>This is "light" version of <code>form_for</code> helper. It accepts just two arguments: params and block. Block didn't receives any params.
 Use this helper when you have no any resource, but still want to be able to use simple method overriding and csrf protection tokens.
@@ -833,7 +831,7 @@ Use this helper when you have no any resource, but still want to be able to use 
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <p>TODO: describe <code>input_tag</code></p>
 
@@ -851,7 +849,7 @@ Use this helper when you have no any resource, but still want to be able to use 
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <p>TODO: describe <code>label_tag</code></p>
 
@@ -869,7 +867,7 @@ Use this helper when you have no any resource, but still want to be able to use 
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <pre class="prettyprint">&lt;%- stylesheet_link_tag('reset', 'style', 'mobile') %&gt;
 </pre>
@@ -896,7 +894,7 @@ Use this helper when you have no any resource, but still want to be able to use 
 
 </div>
 
-<div class="span12">
+<div class="span8">
 
 <pre class="prettyprint">&lt;%- javascript_include_tag(
   'https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js',
@@ -924,11 +922,9 @@ app.set('cssDirectory', '/css/');
 
 <section id="orm"><div class="page-heading">
 
-<h1>Meet ORM: JugglingDB <small>sorf of documentation driven development</small></h1>
+<h1>Meet ORM: JugglingDB</h1>
 
 </div>
-
-<p><strong>NOTE:</strong> features described in section below are only available on develop branch, and some features are not implemented fully.</p>
 
 <h2>1. Configure database</h2>
 
@@ -939,7 +935,7 @@ app.set('cssDirectory', '/css/');
 Describe which database adapter you going to use and how to connect with database in `config/database.json` file
 </div>
 
-<div class="span6">
+<div class="span4">
 
 <pre class="prettyprint">{ "development":
   { "driver":   "redis"
@@ -966,7 +962,7 @@ Describe which database adapter you going to use and how to connect with databas
 
 </div>
 
-<div class="span6">
+<div class="span4">
 
 <p>Checkout list of available adapters in <a href="https://github.com/1602/jugglingdb/blob/master/test/common_test.js">this test</a>. Also possible to specify which database to use to directly in schema, using <code>schema</code> method:</p>
 
@@ -1002,7 +998,7 @@ This method acceps following arguments:</p>
 
 </div>
 
-<div class="span6">
+<div class="span4">
 
 <p>javascript: <code>db/schema.js</code></p>
 
@@ -1020,7 +1016,7 @@ var Book = define('Book', function () {
 
 </div>
 
-<div class="span6">
+<div class="span4">
 
 <p>coffeescript: <code>db/schema.coffee</code></p>
 
@@ -1042,7 +1038,7 @@ Book = define 'Book', -&gt;
 
 <div class="row">
 
-<div class="span12">
+<div class="offset4">
 
 <p>or define <strong>custom schema</strong> (non-juggling), for example, <strong>mongoose</strong>:</p>
 
@@ -1083,7 +1079,7 @@ of course set of possible relations between object will grow
 
 </div>
 
-<div class="span6">
+<div class="span8">
 
 <pre class="prettyprint">User.hasMany(Post,   {as: 'posts',  foreignKey: 'userId'});
 // creates instance methods:
@@ -1138,7 +1134,7 @@ for example if you have scope for <code>Post</code>:</p>
 
 </div>
 
-<div class="span10">
+<div class="span8">
 
 <p>Validations invoked after <code>create</code>, <code>save</code> and <code>updateAttributes</code>, it also possible to skip validations when use <code>save</code> method:</p>
 
@@ -1282,34 +1278,6 @@ test.ok not user.isValid()
 user.email = 'valid@email.tld'
 test.ok user.isValid()
 </pre>
-
-</div>
-
-</div>
-
-<h2>5. Just use your models, don't think about databases</h2>
-
-<div class="row">
-
-<div class="span4">
-
-</div>
-
-<div class="span6">
-
-</div>
-
-</div>
-
-<h2>6. Think about databases: use power of each specific database at 110%</h2>
-
-<div class="row">
-
-<div class="span4">
-
-</div>
-
-<div class="span6">
 
 </div>
 

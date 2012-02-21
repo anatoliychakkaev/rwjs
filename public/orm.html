@@ -4,7 +4,6 @@
     <title>RailwayJS</title>
 
     <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css">
-    <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/javascripts/prettyprint/prettify.css" rel="stylesheet">
@@ -15,7 +14,6 @@
     <script type="text/javascript" src="/javascripts/jquery.min.js"></script>
     <script type="text/javascript" src="http://twitter.github.com/bootstrap/1.3.0/bootstrap-scrollspy.js"></script>
     <script type="text/javascript" src="/javascripts/bootstrap-dropdown.js"></script>
-    <script type="text/javascript" src="/javascripts/bootstrap-collapse.js"></script>
     <script>$(function () { prettyPrint() })</script>
 
     <style>
@@ -56,11 +54,9 @@
 
   <section><div class="page-heading">
 
-<h1>Meet ORM: JugglingDB <small>sorf of documentation driven development</small></h1>
+<h1>Meet ORM: JugglingDB</h1>
 
 </div>
-
-<p><strong>NOTE:</strong> features described in section below are only available on develop branch, and some features are not implemented fully.</p>
 
 <h2>1. Configure database</h2>
 
@@ -71,7 +67,7 @@
 Describe which database adapter you going to use and how to connect with database in `config/database.json` file
 </div>
 
-<div class="span6">
+<div class="span4">
 
 <pre class="prettyprint">{ "development":
   { "driver":   "redis"
@@ -98,7 +94,7 @@ Describe which database adapter you going to use and how to connect with databas
 
 </div>
 
-<div class="span6">
+<div class="span4">
 
 <p>Checkout list of available adapters in <a href="https://github.com/1602/jugglingdb/blob/master/test/common_test.js">this test</a>. Also possible to specify which database to use to directly in schema, using <code>schema</code> method:</p>
 
@@ -134,7 +130,7 @@ This method acceps following arguments:</p>
 
 </div>
 
-<div class="span6">
+<div class="span4">
 
 <p>javascript: <code>db/schema.js</code></p>
 
@@ -152,7 +148,7 @@ var Book = define('Book', function () {
 
 </div>
 
-<div class="span6">
+<div class="span4">
 
 <p>coffeescript: <code>db/schema.coffee</code></p>
 
@@ -174,7 +170,7 @@ Book = define 'Book', -&gt;
 
 <div class="row">
 
-<div class="span12">
+<div class="offset4">
 
 <p>or define <strong>custom schema</strong> (non-juggling), for example, <strong>mongoose</strong>:</p>
 
@@ -215,7 +211,7 @@ of course set of possible relations between object will grow
 
 </div>
 
-<div class="span6">
+<div class="span8">
 
 <pre class="prettyprint">User.hasMany(Post,   {as: 'posts',  foreignKey: 'userId'});
 // creates instance methods:
@@ -270,7 +266,7 @@ for example if you have scope for <code>Post</code>:</p>
 
 </div>
 
-<div class="span10">
+<div class="span8">
 
 <p>Validations invoked after <code>create</code>, <code>save</code> and <code>updateAttributes</code>, it also possible to skip validations when use <code>save</code> method:</p>
 
@@ -414,34 +410,6 @@ test.ok not user.isValid()
 user.email = 'valid@email.tld'
 test.ok user.isValid()
 </pre>
-
-</div>
-
-</div>
-
-<h2>5. Just use your models, don't think about databases</h2>
-
-<div class="row">
-
-<div class="span4">
-
-</div>
-
-<div class="span6">
-
-</div>
-
-</div>
-
-<h2>6. Think about databases: use power of each specific database at 110%</h2>
-
-<div class="row">
-
-<div class="span4">
-
-</div>
-
-<div class="span6">
 
 </div>
 
