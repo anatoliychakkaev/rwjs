@@ -31,7 +31,16 @@
               <li class="dropdown" data-dropdown="dropdown">
                 <a href="#" class="dropdown-toggle">Common</a>
                 <ul class="dropdown-menu">
+                  <li><a href="#create" rel="demo">create</a></li>
+                  <li><a href="#find" rel="demo">find</a></li>
+                  <li><a href="#all" rel="demo">all</a></li>
+                  <li><a href="#updateAttribute" rel="demo">updateAttribute</a></li>
+                  <li><a href="#updateAttributes" rel="demo">updateAttributes</a></li>
+                  <li><a href="#count" rel="demo">count</a></li>
+                  <li><a href="#destroy" rel="demo">destroy</a></li>
+                  <li><a href="#destroyAll" rel="demo">destroyAll</a></li>
                   <li><a href="#hasMany" rel="demo">has many</a></li>
+                  <li><a href="#belongsTo" rel="demo">belongsTo</a></li>
                 </ul>
               </li>
               <li class="dropdown" data-dropdown="dropdown">
@@ -318,6 +327,56 @@ Update hooks is the next in chain after the save hook.
   Post.create(c);
   _1.title = 'Hello world';
   _1.save(c);
+</script>
+
+<script type="text/markdown" name="create">
+## Model.create
+
+Create new instance of Model class, saved in database
+
+## Arguments (all optional)
+- properties
+- callback called with arguments:
+  * err (null or Error)
+  * instance (null or Model)
+
+## Behavior
+- inst = new Model(properties)
+- inst.save(cb)
+</script>
+
+<script type="text/jugglingdb" name="create">
+  User.create(c);
+  User.create({email: 'haha@example.com'}, c);
+  _0
+  _1.email
+</script>
+
+<script type="text/markdown" name="find">
+## Model.find
+
+Find instance of Model by given id
+
+## Arguments
+- id (required)
+- callback (required) called with arguments:
+  * err (null or Error)
+  * instance (null or Model)
+
+## Behavior
+- lookup database by unique index, load data
+- if that record already instantiated, update all non-dirty attributes. Check example to get it.
+</script>
+
+<script type="text/jugglingdb" name="find">
+  Post.create({title: 'hello', content: 'world'}, c);
+  post = _1;
+  post.content = 'jugglingdb'; // make attribute dirty
+  post.propertyChanged('content');
+  Post.find(post.id, c);
+  post.content
+  _1.content
+  post.propertyChanged('content');
 </script>
 
 <script type="text/markdown" name="hasMany">
