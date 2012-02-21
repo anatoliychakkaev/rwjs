@@ -3,7 +3,6 @@
   <head>
     <title>Try JugglingDB</title>
     <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css">
-    <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css">
     <link rel="stylesheet" href="/stylesheets/playground.css">
     <link href="/javascripts/prettyprint/prettify.css" rel="stylesheet">
 
@@ -17,7 +16,6 @@
     <script type="text/javascript" src="/javascripts/playground.js"></script>
     <script type="text/javascript" src="/javascripts/prettyprint/prettify.js"></script>
     <script type="text/javascript" src="/javascripts/bootstrap-dropdown.js"></script>
-    <script type="text/javascript" src="/javascripts/bootstrap-collapse.js"></script>
 
   </head>
   <body>
@@ -25,64 +23,61 @@
       <div class="navbar" data-scrollspy="scrollspy">
         <div class="navbar-inner">
           <div class="container">
-            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </a>
             <a class="brand" href="#">JugglingDB</a>
-            <div class="nav-collapse">
-              <ul class="nav">
-                <li class="dropdown" data-dropdown="dropdown">
-                  <a href="#" class="dropdown-toggle">Base <b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li class="nav-header">Class methods</li>
-                    <li><a href="#create" rel="demo">create</a></li>
-                    <li><a href="#find" rel="demo">find</a></li>
-                    <li><a href="#all" rel="demo">all</a></li>
-                    <li><a href="#count" rel="demo">count</a></li>
-                    <li><a href="#destroyAll" rel="demo">destroyAll</a></li>
-                    <li><a href="#exists" rel="demo">exists</a></li>
-                    <li class="divider"></li>
+            <ul class="nav">
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Base <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li class="nav-header">Class methods</li>
+                  <li><a href="#create" rel="demo">create</a></li>
+                  <li><a href="#find" rel="demo">find</a></li>
+                  <li><a href="#all" rel="demo">all</a></li>
+                  <li><a href="#count" rel="demo">count</a></li>
+                  <li><a href="#destroyAll" rel="demo">destroyAll</a></li>
+                  <li><a href="#exists" rel="demo">exists</a></li>
+                  <li class="divider"></li>
 
-                    <li class="nav-header">Instance methods</li>
-                    <li><a href="#save" rel="demo">save</a></li>
-                    <li><a href="#reload" rel="demo">reload</a></li>
-                    <li><a href="#reset" rel="demo">reset</a></li>
-                    <li><a href="#updateAttribute" rel="demo">updateAttribute</a></li>
-                    <li><a href="#updateAttributes" rel="demo">updateAttributes</a></li>
-                    <li><a href="#destroy" rel="demo">destroy</a></li>
-                    <li class="divider"></li>
+                  <li class="nav-header">Instance methods</li>
+                  <li><a href="#save" rel="demo">save</a></li>
+                  <li><a href="#reload" rel="demo">reload</a></li>
+                  <li><a href="#reset" rel="demo">reset</a></li>
+                  <li><a href="#updateAttribute" rel="demo">updateAttribute</a></li>
+                  <li><a href="#updateAttributes" rel="demo">updateAttributes</a></li>
+                  <li><a href="#destroy" rel="demo">destroy</a></li>
+                  <li class="divider"></li>
 
-                    <li class="nav-header">Model definitions</li>
-                    <li><a href="#hasMany" rel="demo">has many</a></li>
-                    <li><a href="#belongsTo" rel="demo">belongsTo</a></li>
-                  </ul>
-                </li>
-                <li class="dropdown" data-dropdown="dropdown">
-                  <a href="#" class="dropdown-toggle">Validations <b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li><a href="#validatesPresenceOf" rel="demo">presence</a></li>
-                    <li><a href="#validatesLengthOf" rel="demo">length</a></li>
-                    <li><a href="#validatesFormatOf" rel="demo">format</a></li>
-                    <li><a href="#validatesNumericalityOf" rel="demo">numericality</a></li>
-                    <li><a href="#validatesInclusionOf" rel="demo">inclusion</a></li>
-                    <li><a href="#validatesExclusionOf" rel="demo">exclusion</a></li>
-                    <li><a href="#validateCustom" rel="demo">custom</a></li>
-                    <li><a href="#validateCustomAsync" rel="demo">custom async</a></li>
-                    <li><a href="#validatesUniquenessOf" rel="demo">uniqueness</a></li>
-                  </ul>
-                </li>
-                <li class="dropdown" data-dropdown="dropdown">
-                  <a href="#" class="dropdown-toggle">Hooks <b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li><a href="#hookInitialize" rel="demo">initialize</a></li>
-                    <li><a href="#hookSave" rel="demo">save / create</a></li>
-                    <li><a href="#hookUpdate" rel="demo">save / update</a></li>
-                  </ul>
-                </li>
-              </ul>
-            </div>
+                  <li class="nav-header">Model definitions</li>
+                  <li><a href="#hasMany" rel="demo">has many</a></li>
+                  <li><a href="#belongsTo" rel="demo">belongsTo</a></li>
+                </ul>
+              </li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Validations <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li class="nav-header">Sync validations</li>
+                  <li><a href="#validatesPresenceOf" rel="demo">presence</a></li>
+                  <li><a href="#validatesLengthOf" rel="demo">length</a></li>
+                  <li><a href="#validatesFormatOf" rel="demo">format</a></li>
+                  <li><a href="#validatesNumericalityOf" rel="demo">numericality</a></li>
+                  <li><a href="#validatesInclusionOf" rel="demo">inclusion</a></li>
+                  <li><a href="#validatesExclusionOf" rel="demo">exclusion</a></li>
+                  <li><a href="#validateCustom" rel="demo">custom</a></li>
+                  <li class="divider"></li>
+
+                  <li class="nav-header">Async validations</li>
+                  <li><a href="#validateCustomAsync" rel="demo">custom async</a></li>
+                  <li><a href="#validatesUniquenessOf" rel="demo">uniqueness</a></li>
+                </ul>
+              </li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Hooks <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#hookInitialize" rel="demo">initialize</a></li>
+                  <li><a href="#hookSave" rel="demo">save / create</a></li>
+                  <li><a href="#hookUpdate" rel="demo">save / update</a></li>
+                </ul>
+              </li>
+            </ul>
           </div>
         </div><!-- /topbar-inner -->
       </div><!-- /topbar -->
@@ -92,7 +87,7 @@
 
   <div class="row">
 
-  <div class="span-one-half" id="doc" style="width: 450px;">
+  <div class="span6" id="doc" style="width: 450px;">
     Choose one of examples from the top bar's dropdowns (Common, Validations, Hooks, etc..), or just write your code after the <strong class="jugg">"jugglingdb>"</strong> prompt.
 
   <pre class="prettyprint">User = schema.define('User', {
@@ -111,7 +106,7 @@ Post = schema.define('Post', {
 });</pre>
 
   </div>
-  <div class="span-one-half" style="width: 450px;">
+  <div class="span6" style="width: 450px;">
 
     <div class="example" id="example" style="overflow: auto; width: 450px;">
       <form><strong class="jugg">jugglingdb></strong>
@@ -137,7 +132,6 @@ Post = schema.define('Post', {
     <input type="hidden" name="cmd" value="_s-xclick">
     <input type="hidden" name="hosted_button_id" value="J3JJDYJW78LEJ">
     <input type="image" style="box-shadow: none; -webkit-box-shadow: none; padding: 0; border: 0; width: 147px; height: 47px;" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-    <img alt="" border="0" src="https://www.paypalobjects.com/ru_RU/i/scr/pixel.gif" width="1" height="1">
   </form>
 </div>
 </footer>
