@@ -1,28 +1,3 @@
-if (!Function.prototype.bind) {
-  Function.prototype.bind = function (oThis) {
-    if (typeof this !== "function") {
-      // closest thing possible to the ECMAScript 5 internal IsCallable function
-      throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
-    }
-
-    var fSlice = Array.prototype.slice,
-        aArgs = fSlice.call(arguments, 1), 
-        fToBind = this, 
-        fNOP = function () {},
-        fBound = function () {
-          return fToBind.apply(this instanceof fNOP
-                                 ? this
-                                 : oThis || window,
-                               aArgs.concat(fSlice.call(arguments)));
-        };
-
-    fNOP.prototype = this.prototype;
-    fBound.prototype = new fNOP();
-
-    return fBound;
-  };
-}
-
 var require = function (file, cwd) {
     var resolved = require.resolve(file, cwd || '/');
     var mod = require.modules[resolved];
@@ -349,9 +324,20 @@ require.define("/node_modules/jugglingdb/package.json", function (require, modul
 });
 
 require.define("/node_modules/jugglingdb/index.js", function (require, module, exports, __dirname, __filename) {
-    exports.Schema = require('./lib/schema').Schema;
+    var fs = require('fs');
+
+exports.Schema = require('./lib/schema').Schema;
 exports.AbstractClass = require('./lib/abstract-class').AbstractClass;
 exports.Validatable = require('./lib/validatable').Validatable;
+
+try {
+    exports.version = JSON.parse(fs.readFileSync(__dirname + '/package.json')).version;
+} catch (e) {}
+
+});
+
+require.define("fs", function (require, module, exports, __dirname, __filename) {
+    // nothing to see here... no file methods for the browser
 
 });
 
@@ -374,12 +360,6 @@ exports.Schema = Schema;
  */
 var slice = Array.prototype.slice;
 
-if (!(function () {}).bind) {
-    Function.prototype.bind = function () {
-    };
-}
-
-
 /**
  * Shema - classes factory
  * @param name - type of schema adapter (mysql, mongoose, sequelize, redis)
@@ -400,7 +380,6 @@ function Schema(name, settings) {
     // this is only one initialization entry point of adapter
     // this module should define `adapter` member of `this` (schema)
     var adapter = require('./adapters/memory.js');
-
     adapter.initialize(this, function () {
         this.connected = true;
         this.emit('connected');
@@ -430,16 +409,45 @@ function Text() {
 }
 Schema.Text = Text;
 
+Schema.prototype.defineProperty = function (model, prop, params) {
+    this.definitions[model].properties[prop] = params;
+    if (this.adapter.defineProperty) {
+        this.adapter.defineProperty(model, prop, params);
+    }
+};
+
 Schema.prototype.automigrate = function (cb) {
     this.freeze();
     if (this.adapter.automigrate) {
         this.adapter.automigrate(cb);
-    } else {
-        cb && cb();
+    } else if (cb) {
+        cb();
     }
 };
 
-Schema.prototype.log = function () {
+Schema.prototype.autoupdate = function (cb) {
+    this.freeze();
+    if (this.adapter.autoupdate) {
+        this.adapter.autoupdate(cb);
+    } else if (cb) {
+        cb();
+    }
+};
+
+/**
+ * Check whether migrations needed
+ */
+Schema.prototype.isActual = function (cb) {
+    this.freeze();
+    if (this.adapter.isActual) {
+        this.adapter.isActual(cb);
+    } else if (cb) {
+        cb(null, true);
+    }
+};
+
+Schema.prototype.log = function (sql, t) {
+    this.emit('log', sql, t);
 };
 
 Schema.prototype.freeze = function freeze() {
@@ -468,7 +476,10 @@ Schema.prototype.define = function defineClass(className, properties, settings) 
     standartize(properties, settings);
 
     // every class can receive hash of data as optional param
-    var newClass = function (data) {
+    var newClass = function ModelConstructor(data) {
+        if (!(this instanceof ModelConstructor)) {
+            return new ModelConstructor(data);
+        }
         AbstractClass.call(this, data);
     };
 
@@ -597,10 +608,18 @@ function AbstractClass(data) {
         // Public setters and getters
         Object.defineProperty(this, attr, {
             get: function () {
-                return this[_attr];
+                if (this.constructor.getter[attr]) {
+                    return this.constructor.getter[attr].call(this);
+                } else {
+                    return this[_attr];
+                }
             },
             set: function (value) {
-                this[_attr] = value;
+                if (this.constructor.setter[attr]) {
+                    this.constructor.setter[attr].call(this, value);
+                } else {
+                    this[_attr] = value;
+                }
             },
             configurable: true,
             enumerable: true
@@ -632,16 +651,31 @@ function AbstractClass(data) {
     this.trigger("initialize");
 };
 
+AbstractClass.setter = {};
+AbstractClass.getter = {};
+
+AbstractClass.defineProperty = function (prop, params) {
+    this.schema.defineProperty(this.modelName, prop, params);
+};
+
+AbstractClass.whatTypeName = function (propName) {
+    var ds = this.schema.definitions[this.modelName];
+    return ds.properties[propName].type.name;
+};
+
+AbstractClass.prototype.whatTypeName = function (propName) {
+    return this.constructor.whatTypeName(propName);
+};
+
 /**
  * @param data [optional]
  * @param callback(err, obj)
  */
-AbstractClass.create = function (data) {
+AbstractClass.create = function (data, callback) {
     var modelName = this.modelName;
 
-    // define callback manually
-    var callback = arguments[arguments.length - 1];
-    if (arguments.length == 0 || data === callback) {
+    if (typeof data === 'function') {
+        callback = data;
         data = {};
     }
 
@@ -657,6 +691,7 @@ AbstractClass.create = function (data) {
         create();
     } else {
         obj = new this(data);
+        data = obj.toObject(true);
 
         // validation required
         obj.isValid(function (valid) {
@@ -686,7 +721,11 @@ AbstractClass.create = function (data) {
 };
 
 AbstractClass.exists = function exists(id, cb) {
-    this.schema.adapter.exists(this.modelName, id, cb);
+    if (id) {
+        this.schema.adapter.exists(this.modelName, id, cb);
+    } else {
+        cb(new Error('Model::exists requires positive id argument'));
+    }
 };
 
 AbstractClass.find = function find(id, cb) {
@@ -695,6 +734,7 @@ AbstractClass.find = function find(id, cb) {
         if (data) {
             if (this.cache[data.id]) {
                 obj = this.cache[data.id];
+                substractDirtyAttributes(obj, data);
                 this.call(obj, data);
             } else {
                 obj = new this(data);
@@ -728,6 +768,8 @@ AbstractClass.all = function all(params, cb) {
                 // TODO: think about better implementation, test keeping dirty state
                 if (constr.cache[d.id]) {
                     obj = constr.cache[d.id];
+                    // keep dirty attributes untouthed (remove from dataset)
+                    substractDirtyAttributes(obj, d);
                     constr.call(obj, d);
                 } else {
                     obj = new constr(d);
@@ -740,6 +782,14 @@ AbstractClass.all = function all(params, cb) {
     });
 };
 
+function substractDirtyAttributes(object, data) {
+    Object.keys(object.toObject()).forEach(function (attr) {
+        if (attr in data && object.propertyChanged(attr)) {
+            delete data[attr];
+        }
+    });
+}
+
 AbstractClass.destroyAll = function destroyAll(cb) {
     this.schema.adapter.destroyAll(this.modelName, function (err) {
         if (!err) {
@@ -751,8 +801,12 @@ AbstractClass.destroyAll = function destroyAll(cb) {
     }.bind(this));
 };
 
-AbstractClass.count = function (cb) {
-    this.schema.adapter.count(this.modelName, cb);
+AbstractClass.count = function (where, cb) {
+    if (typeof where === 'function') {
+        cb = where;
+        where = null;
+    }
+    this.schema.adapter.count(this.modelName, cb, where);
 };
 
 AbstractClass.toString = function () {
@@ -928,17 +982,32 @@ AbstractClass.prototype.propertyChanged = function (attr) {
 };
 
 AbstractClass.prototype.reload = function (cb) {
+    var obj = this.constructor.cache[this.id];
+    if (obj) {
+        obj.reset();
+    }
     this.constructor.find(this.id, cb);
+};
+
+AbstractClass.prototype.reset = function () {
+    var obj = this;
+    Object.keys(obj).forEach(function (k) {
+        if (k !== 'id' && !obj.constructor.schema.definitions[obj.constructor.modelName].properties[k]) {
+            delete obj[k];
+        }
+        if (obj.propertyChanged(k)) {
+            obj[k] = obj[k + '_was'];
+        }
+    });
 };
 
 // relations
 AbstractClass.hasMany = function (anotherClass, params) {
     var methodName = params.as; // or pluralize(anotherClass.modelName)
     var fk = params.foreignKey;
-    // console.log(this.modelName, 'has many', anotherClass.modelName, 'as', params.as, 'queried by', params.foreignKey);
     // each instance of this class should have method named
     // pluralize(anotherClass.modelName)
-    // which is actually just anotherClass.all({thisModelNameId: this.id}, cb);
+    // which is actually just anotherClass.all({where: {thisModelNameId: this.id}}, cb);
     defineScope(this.prototype, anotherClass, methodName, function () {
         var x = {};
         x[fk] = this.id;
@@ -1235,7 +1304,6 @@ Validatable.prototype.isValid = function (callback) {
         var inst = this;
         this.constructor._validations.forEach(function (v) {
             if (v[2] && v[2].async) {
-                valid = false;
                 async = true;
                 wait += 1;
                 validationFailed(inst, v, done);
@@ -1247,22 +1315,33 @@ Validatable.prototype.isValid = function (callback) {
 
         });
 
+        if (!async) {
+            validationsDone();
+        }
+
         var asyncFail = false;
         function done(fail) {
             asyncFail = asyncFail || fail;
             if (--wait === 0 && callback) {
                 validationsDone.call(inst, function () {
-                    callback(!asyncFail);
+                    if( valid && !asyncFail ) cleanErrors(inst);
+                    callback(valid && !asyncFail);
                 });
             }
         }
 
     });
 
-    if (valid) cleanErrors(this);
-    if (!async && callback) callback(valid);
+    if (!async) {
+        if (valid) cleanErrors(this);
+        if (callback) callback(valid);
+        return valid;
+    } else {
+        // in case of async validation we should return undefined here,
+        // because not all validations are finished yet
+        return;
+    }
 
-    return valid;
 };
 
 function cleanErrors(inst) {
@@ -1548,9 +1627,46 @@ Memory.prototype.all = function all(model, filter, callback) {
     var nodes = Object.keys(this.cache[model]).map(function (key) {
         return this.cache[model][key];
     }.bind(this));
+
+    if (filter) {
+
+        // do we need some filtration?
+        if (filter.where) {
+            nodes = nodes ? nodes.filter(applyFilter(filter)) : nodes;
+        }
+
+        // do we need some sorting?
+        if (filter.order) {
+            var props = this._models[model].properties;
+            var allNumeric = true;
+            var orders = filter.order;
+            if (typeof filter.order === "string") {
+                orders = [filter.order];
+            }
+            orders.forEach(function (key) {
+                if (props[key].type.name !== 'Number' && props[key].type.name !== 'Date') {
+                    allNumeric = false;
+                }
+            });
+            if (allNumeric) {
+                nodes = nodes.sort(numerically.bind(orders));
+            } else {
+                nodes = nodes.sort(literally.bind(orders));
+            }
+        }
+    }
+
     process.nextTick(function () {
-        callback(null, filter && nodes ? nodes.filter(applyFilter(filter)) : nodes);
+        callback(null, nodes);
     });
+
+    function numerically(a, b) {
+        return a[this[0]] - b[this[0]];
+    }
+
+    function literally(a, b) {
+        return a[this[0]] > b[this[0]];
+    }
 };
 
 function applyFilter(filter) {
@@ -1585,8 +1701,21 @@ Memory.prototype.destroyAll = function destroyAll(model, callback) {
     callback();
 };
 
-Memory.prototype.count = function count(model, callback) {
-    callback(null, Object.keys(this.cache[model]).length);
+Memory.prototype.count = function count(model, callback, where) {
+    var cache = this.cache[model];
+    var data = Object.keys(cache)
+    if (where) {
+        data = data.filter(function (id) {
+            var ok = true;
+            Object.keys(where).forEach(function (key) {
+                if (cache[id][key] != where[key]) {
+                    ok = false;
+                }
+            });
+            return ok;
+        });
+    }
+    callback(null, data.length);
 };
 
 Memory.prototype.updateAttributes = function updateAttributes(model, id, data, cb) {
