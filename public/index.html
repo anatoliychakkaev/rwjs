@@ -918,6 +918,30 @@ app.set('cssDirectory', '/css/');
 
 </div>
 
+</div>
+
+<div class="row">
+
+<div class="span4">
+
+<h3>Defining your own helpers</h3>
+
+</div>
+
+<div class="span8">
+
+<p>You can define your own helpers for each controller in the file <code>app/helpers/_controllername__helpers.js</code>. For example, if you want to define a helper called <code>my_helper</code> for use in the <code>users</code> controller, put the following in <code>app/helpers/users_controller.js</code>:</p>
+
+<pre class="prettyprint">module.exports = {
+  my_helper: function () {
+    return "This is my helper!";
+  }
+}
+</pre>
+
+The function `my_helper` can be now used by any of the views used by the `users` controller.
+</div>
+
 </div></section>
 
 <section id="orm"><div class="page-heading">
@@ -954,7 +978,7 @@ Describe which database adapter you going to use and how to connect with databas
   , "host":     "localhost"
   , "post":     3306
   , "database": "nodeapp-production"
-  , "username": "nodeapp-prod",
+  , "username": "nodeapp-prod"
   , "password": "t0ps3cr3t"
   }
 }
@@ -1040,7 +1064,12 @@ Book = define 'Book', -&gt;
 
 <div class="offset4">
 
-<p>or define <strong>custom schema</strong> (non-juggling), for example, <strong>mongoose</strong>:</p>
+<p>or define <strong>custom schema</strong> (non-juggling), for example, <strong>mongoose</strong>.
+Please note, in case of custom schema all jugglingdb features of course will be disabled.</p>
+
+</div>
+
+<div class="span12">
 
 <pre class="prettyprint">customSchema(function () {
 
@@ -1254,7 +1283,7 @@ test.ok not user.isValid()
 test.equal user.errors.gender[0], 'is not included in the list'
 </pre>
 
-<h6>exclution</h6>
+<h6>exclusion</h6>
 
 <pre class="prettyprint">User.validatesExclusionOf 'domain', in: ['www', 'admin']
 user = new User validAttributes
@@ -1280,6 +1309,25 @@ test.ok user.isValid()
 </pre>
 
 </div>
+
+</div>
+
+<div class="row">
+
+<h3>defining additional model functions</h3>
+
+<p>You can define additional functions to your models by editing the file <code>app/models/modelname.js</code>:</p>
+
+<pre class="prettyprint">User.getActiveUsers = function getActiveUsers(callback) {
+  Users.all({active: true}, callback);
+}
+
+User.prototype.getFullName = function getFullName() {
+  return return [this.firstName, this.lastName].join(' ');
+};
+</pre>
+
+<p>Functions that need access to a specific User instance need to be declared in the prototype, otherwise they will not be available.</p>
 
 </div></section>
 
